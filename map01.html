@@ -70,7 +70,6 @@
                     <div class="iac-actions">
                         <button type="button" class="iac-btn iac-btn--primary" id="iac-btn-confirm">确认</button>
                         <button type="button" class="iac-btn iac-btn--secondary" id="iac-btn-pdf" hidden>另存为 PDF</button>
-                        <p id="iac-print-hint" class="iac-print-hint" hidden>与测评报告相同：将打开打印预览，在打印机中选择「<strong>存储为 PDF</strong>」或「<strong>Microsoft Print to PDF</strong>」后保存即可。</p>
                     </div>
                 </div>
             </div>
@@ -82,11 +81,9 @@
             var root = document.getElementById("pdf-capture-root");
             var confirmBtn = document.getElementById("iac-btn-confirm");
             var pdfBtn = document.getElementById("iac-btn-pdf");
-            var hint = document.getElementById("iac-print-hint");
 
             confirmBtn.addEventListener("click", function () {
                 pdfBtn.hidden = false;
-                if (hint) hint.hidden = false;
                 root.classList.add("iac-form-confirmed");
             });
 
