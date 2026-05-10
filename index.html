@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>必维职业发展规划测评 05 | Bureau Veritas Career Development</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1e3a5f; --secondary: #2c5282; --accent: #d4af37;
+            --accent-light: #f4d03f; --bv-blue: #0055a4; --bv-light: #e6f0f8;
+            --bg-light: #f8fafc; --text-dark: #1a202c; --text-gray: #4a5568;
+            --white: #ffffff; --ai-purple: #7c3aed; --ai-light: #ede9fe;
+            --shadow: 0 10px 40px rgba(30, 58, 95, 0.1);
+            --shadow-hover: 0 20px 60px rgba(30, 58, 95, 0.15);
+            --p0-color: #0055a4; --p1-color: #2c5282; --p2-color: #7c3aed;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e6f0f8 100%);
+            min-height: 100vh; color: var(--text-dark); overflow-x: hidden;
+        }
+        img.red-corner {
+            position: fixed; top: 0; left: 0; width: 100px; height: 100px;
+            object-fit: contain; object-position: top left; display: block;
+            z-index: 10002; pointer-events: none;
+        }
+        .lh-brand {
+            position: fixed; top: 2px; right: 10px; width: auto; height: auto;
+            z-index: 10002; pointer-events: none;
+        }
+        .lh-brand img { height: 100px; width: auto; display: block; object-fit: contain; }
+        .container {
+            max-width: 900px; margin: 0 auto; padding: 40px 20px;
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+        }
+        .intro-section, .quiz-section, .result-section { animation: fadeInUp 0.6s ease-out; }
+        .quiz-section, .result-section { display: none; }
+        .logo {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, var(--bv-blue), var(--primary));
+            border-radius: 20px; margin: 0 auto 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: var(--accent); box-shadow: var(--shadow);
+            position: relative; overflow: hidden; font-weight: 700;
+        }
+        .logo::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        h1 { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; font-weight: 700; letter-spacing: -0.5px; }
+        .subtitle { font-size: 1.1rem; color: var(--text-gray); margin-bottom: 30px; font-weight: 300; }
+        .context-banner {
+            background: linear-gradient(135deg, var(--bv-blue), var(--secondary));
+            color: white; padding: 25px 30px; border-radius: 16px;
+            margin-bottom: 30px; text-align: left; box-shadow: var(--shadow);
+        }
+        .context-banner h3 { font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .context-banner p { font-size: 0.95rem; line-height: 1.8; opacity: 0.95; margin-bottom: 10px; }
+        .intro-card {
+            background: var(--white); border-radius: 24px; padding: 40px;
+            box-shadow: var(--shadow); margin-bottom: 30px; text-align: left;
+            border: 1px solid rgba(30, 58, 95, 0.05);
+        }
+        .intro-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        .intro-card p { color: var(--text-gray); line-height: 1.8; margin-bottom: 15px; }
+        .top-model {
+            background: var(--bv-light); border-radius: 16px; padding: 25px;
+            margin: 20px 0; border-left: 4px solid var(--bv-blue);
+        }
+        .top-model h4 { color: var(--bv-blue); margin-bottom: 15px; font-size: 1.1rem; }
+        .top-model ul { margin-left: 20px; color: var(--text-gray); line-height: 1.8; }
+        .top-model li { margin-bottom: 8px; }
+        .ai-highlight {
+            background: linear-gradient(135deg, var(--ai-light), #fff);
+            border-left: 4px solid var(--ai-purple); padding: 20px;
+            border-radius: 12px; margin: 20px 0;
+        }
+        .ai-highlight h4 { color: var(--ai-purple); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .ai-highlight p { color: var(--text-gray); line-height: 1.7; margin: 0; }
+        .influence-highlight {
+            background: linear-gradient(135deg, #e6f0f8, #fff);
+            border-left: 4px solid var(--bv-blue); padding: 20px;
+            border-radius: 12px; margin: 20px 0;
+        }
+        .influence-highlight h4 { color: var(--bv-blue); margin-bottom: 10px; font-size: 1.1rem; }
+        .influence-highlight p { color: var(--text-gray); line-height: 1.7; margin: 0; }
+        .vuca-note {
+            background: linear-gradient(135deg, #fff9e6, #fff);
+            border: 1px solid var(--accent); border-radius: 12px;
+            padding: 20px; margin-top: 20px; text-align: left;
+        }
+        .vuca-note h4 { color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .vuca-note p { color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; }
+        .input-group { margin: 25px 0; text-align: left; }
+        .input-group label { display: block; color: var(--primary); font-weight: 600; margin-bottom: 10px; font-size: 1rem; }
+        .input-group select {
+            width: 100%; padding: 15px 20px; border: 2px solid #e2e8f0;
+            border-radius: 12px; font-size: 1rem; transition: all 0.3s ease;
+            font-family: inherit; background: var(--white); cursor: pointer;
+        }
+        .input-group select:focus { outline: none; border-color: var(--bv-blue); box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.1); }
+        .input-hint { font-size: 0.85rem; color: var(--text-gray); margin-top: 8px; }
+        .radio-group { display: flex; gap: 15px; flex-wrap: wrap; }
+        .radio-card {
+            flex: 1; min-width: 200px; padding: 20px; background: var(--bg-light);
+            border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer;
+            transition: all 0.3s ease; text-align: center; position: relative;
+        }
+        .radio-card:hover { border-color: var(--bv-blue); background: #fff; transform: translateY(-2px); }
+        .radio-card.selected {
+            background: linear-gradient(135deg, var(--bv-blue), var(--secondary));
+            color: white; border-color: var(--bv-blue);
+        }
+        .radio-card .radio-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; display: block; }
+        .radio-card .radio-desc { font-size: 0.85rem; opacity: 0.8; line-height: 1.4; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--bv-blue), var(--secondary));
+            color: white; border: none; padding: 16px 50px; font-size: 1.1rem;
+            border-radius: 50px; cursor: pointer; font-weight: 600;
+            transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,85,164,0.3);
+        }
+        .btn-primary:disabled { background: #cbd5e0; cursor: not-allowed; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
+        .question-card {
+            background: var(--white); border-radius: 24px; padding: 40px 30px;
+            box-shadow: var(--shadow); text-align: center;
+        }
+        .question-text { font-size: 1.3rem; margin-bottom: 30px; line-height: 1.6; }
+        .options-container { display: flex; flex-direction: column; gap: 12px; max-width: 500px; margin: 0 auto; }
+        .option-btn {
+            background: var(--bg-light); border: 2px solid transparent; padding: 15px 20px;
+            border-radius: 12px; cursor: pointer; text-align: left; display: flex;
+            justify-content: space-between; align-items: center; transition: all 0.3s;
+        }
+        .option-btn:hover { background: #fff; border-color: var(--bv-blue); transform: translateX(5px); }
+        .option-btn.selected { background: linear-gradient(135deg, var(--bv-blue), var(--secondary)); color: white; }
+        .progress-container { background: var(--white); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--bv-blue), var(--accent)); width: 0%; transition: width 0.3s; }
+        .result-code { font-size: 3rem; font-weight: 800; letter-spacing: 5px; margin: 20px 0; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .chart-container, .scores-container { background: var(--white); border-radius: 20px; padding: 20px; }
+        .chart-title { font-weight: 700; color: var(--primary); margin-bottom: 14px; font-size: 1rem; }
+        .score-item { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .score-letter { width: 40px; height: 40px; background: var(--bv-blue); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .score-bar-bg { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .score-bar-fill { height: 100%; background: linear-gradient(90deg, var(--bv-blue), var(--accent)); width: 0%; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; } }
+        /* 测评结果页：隐藏角标与礼淮 Logo（屏幕与打印） */
+        body.bv-report-view img.red-corner,
+        body.bv-report-view .lh-brand {
+            display: none !important;
+        }
+        .report-section {
+            background: var(--white); border-radius: 24px; padding: 30px;
+            margin-bottom: 20px; box-shadow: var(--shadow);
+        }
+        .report-section h3 {
+            color: var(--primary); margin-bottom: 16px; font-size: 1.15rem;
+            border-bottom: 2px solid var(--bv-light); padding-bottom: 10px;
+        }
+        .report-section p { color: var(--text-gray); line-height: 1.8; margin-bottom: 12px; }
+        .report-section ul { margin-left: 20px; color: var(--text-gray); line-height: 1.8; }
+        .report-section li { margin-bottom: 8px; }
+        .tag-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-right: 8px; margin-bottom: 8px; }
+        .tag-primary { background: var(--bv-light); color: var(--bv-blue); }
+        .tag-accent { background: #fff8e6; color: #8a6e2b; }
+        .tag-purple { background: var(--ai-light); color: var(--ai-purple); }
+        .recommendation-card {
+            background: var(--bv-light); padding: 20px; border-radius: 16px;
+            margin-bottom: 16px; border-left: 4px solid var(--bv-blue);
+        }
+        .rec-title { font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+        .rec-content { color: var(--text-gray); line-height: 1.75; }
+        .artistic-note {
+            max-width: 640px; margin: 18px auto 0; text-align: left;
+            background: linear-gradient(135deg, #faf5ff, #fff);
+            border-left: 4px solid var(--ai-purple); border-radius: 14px;
+            padding: 16px 18px; font-size: 0.92rem; line-height: 1.75; color: var(--text-gray);
+        }
+        .btn-outline {
+            background: transparent; border: 2px solid var(--bv-blue);
+            color: var(--bv-blue); padding: 12px 30px; border-radius: 50px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s; margin-top: 20px;
+        }
+        .btn-outline:hover { background: var(--bv-blue); color: white; }
+        .priority-badge {
+            display: inline-block; padding: 3px 12px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-left: 10px;
+        }
+        .badge-p0 { background: #e6f0f8; color: var(--p0-color); }
+        .badge-p1 { background: #e6f0f8; color: var(--p1-color); }
+        .badge-p2 { background: var(--ai-light); color: var(--p2-color); }
+        .rare-note {
+            background: linear-gradient(135deg, #fff8e6, #fff);
+            border: 1px solid var(--accent); border-radius: 14px;
+            padding: 20px; margin: 15px 0;
+        }
+        .rare-note h4 { color: var(--accent); margin-bottom: 10px; }
+        .rare-note p { color: var(--text-gray); line-height: 1.7; margin: 0; }
+        .action-30 {
+            background: linear-gradient(135deg, #f0f9ff, #fff);
+            border-left: 3px solid var(--bv-blue); border-radius: 10px;
+            padding: 12px 16px; margin: 10px 0; font-size: 0.9rem;
+            color: var(--text-gray); line-height: 1.6;
+        }
+        .action-30 strong { color: var(--bv-blue); }
+    </style>
+</head>
+<body>
+<img class="red-corner" src="images/colorpatch.png" alt="" width="100" height="100" decoding="async">
+<div class="lh-brand"><img src="images/lh_logo.png" alt="礼淮咨询 Logo"></div>
+<div class="container" id="app"></div>
+
+<script>
+    // ==================== 配置区 ====================
+    /** 岗位四类（与测评选项 value 一致） */
+    const JOB_CATEGORIES = [
+        '检验检测与认证类',
+        '销售与市场类',
+        '项目管理与运营支持类',
+        '管理职能与支持类'
+    ];
+    /** 价值链/交付视角：检测、销售市场、项目交付与运营支持 */
+    const FRONT_LINE_JOBS = ['检验检测与认证类', '销售与市场类', '项目管理与运营支持类'];
+    const ROLE_TYPES = { individual: '个人贡献者', manager: '管理岗' };
+    const CAREER_GOALS = { expert: '专家岗', manager: '管理岗' };
+
+    const hollandCodes = {
+        R: { name: '实际型', strengths: ['技术实操','问题解决','流程优化'] },
+        I: { name: '研究型', strengths: ['数据分析','创新研究','系统思考'] },
+        A: { name: '艺术型', strengths: ['创意设计','品牌塑造','用户体验'] },
+        S: { name: '社会型', strengths: ['团队协作','人才培养','客户关系'] },
+        E: { name: '企业型', strengths: ['项目管理','业务拓展','变革推动'] },
+        C: { name: '常规型', strengths: ['质量控制','合规管理','运营效率'] }
+    };
+
+    const options = [
+        { text: '完全不像我', score: 1 }, { text: '不太像我', score: 2 },
+        { text: '一般', score: 3 }, { text: '比较像我', score: 4 }, { text: '非常像我', score: 5 }
+    ];
+
+    const questions = [
+        { code: 'R', text: '使用工具进行实际操作，比如修理设备或优化工作流程' },
+        { code: 'R', text: '在现场解决具体的技术问题' },
+        { code: 'R', text: '对机械设备和检测工具的工作原理感兴趣' },
+        { code: 'R', text: '动手制作原型或测试样品' },
+        { code: 'R', text: '执行具体明确的任务，而不是抽象规划' },
+        { code: 'R', text: '在实验室或现场环境中工作' },
+        { code: 'R', text: '使用各种专业设备和软件工具' },
+        { code: 'R', text: '解决实际的技术难题' },
+        { code: 'R', text: '改进工艺和提升效率' },
+        { code: 'R', text: '看到工作的具体成果，比如完成检测或修复设备' },
+        { code: 'I', text: '研究新的检测技术和行业标准' },
+        { code: 'I', text: '阅读技术文献和学术报告' },
+        { code: 'I', text: '进行实验和数据分析来验证假设' },
+        { code: 'I', text: '对复杂系统的逻辑和原理感兴趣' },
+        { code: 'I', text: '独立思考和解决复杂技术问题' },
+        { code: 'I', text: '对新技术的应用和数字化转型感兴趣' },
+        { code: 'I', text: '分析业务数据并发现改进机会' },
+        { code: 'I', text: '探索新的方法论和最佳实践' },
+        { code: 'I', text: '用科学方法解决业务问题' },
+        { code: 'I', text: '在安静的环境中专注于深度研究' },
+        { code: 'A', text: '设计美观的报告展示和可视化方案' },
+        { code: 'A', text: '撰写有创意的技术文档或培训材料' },
+        { code: 'A', text: '用创新的方式呈现复杂的检测数据' },
+        { code: 'A', text: '在工作中体现原创性和独特视角' },
+        { code: 'A', text: '设计更好的客户体验流程' },
+        { code: 'A', text: '具有丰富的想象力和创新思维' },
+        { code: 'A', text: '用非传统、灵活的方法解决问题' },
+        { code: 'A', text: '对品牌建设和视觉传达保持敏感' },
+        { code: 'A', text: '通过创意方式提升服务质量' },
+        { code: 'A', text: '工作方式灵活，不受僵化流程的束缚' },
+        { code: 'S', text: '培训指导团队成员，帮助他们成长' },
+        { code: 'S', text: '与客户深入交流并理解他们的需求' },
+        { code: 'S', text: '理解同事和客户的感受与期望' },
+        { code: 'S', text: '教导新人掌握专业技能' },
+        { code: 'S', text: '对团队协作和人际沟通感兴趣' },
+        { code: 'S', text: '参与跨部门合作项目' },
+        { code: 'S', text: '调解冲突并促进团队合作' },
+        { code: 'S', text: '支持他人并帮助他们成功' },
+        { code: 'S', text: '建立良好的人际关系和信任' },
+        { code: 'S', text: '在团队中扮演协调者的角色' },
+        { code: 'E', text: '推动业务拓展和新客户开发' },
+        { code: 'E', text: '领导项目并推动变革落地' },
+        { code: 'E', text: '说服客户接受我们的解决方案' },
+        { code: 'E', text: '对业务战略和市场机会感兴趣' },
+        { code: 'E', text: '参与竞争并追求业务目标' },
+        { code: 'E', text: '组织和协调跨部门资源' },
+        { code: 'E', text: '参与公司战略规划和决策' },
+        { code: 'E', text: '具备商业敏感度并愿意承担风险' },
+        { code: 'E', text: '制定目标并带领团队实现' },
+        { code: 'E', text: '重视业务成果和职业成就' },
+        { code: 'C', text: '确保工作流程的标准化和规范化' },
+        { code: 'C', text: '处理数据并保证其准确无误' },
+        { code: 'C', text: '熟练使用办公软件和管理系统' },
+        { code: 'C', text: '遵循既定的质量标准和程序' },
+        { code: 'C', text: '对合规管理和风险控制感兴趣' },
+        { code: 'C', text: '有条理地组织文档和信息' },
+        { code: 'C', text: '注重细节，在报告中很少出错' },
+        { code: 'C', text: '在稳定、可预测的环境中工作' },
+        { code: 'C', text: '处理财务数据和预算管理' },
+        { code: 'C', text: '完成有明确标准的工作任务' }
+    ];
+
+    // ==================== P0: 高频组合（12种）完整定制 ====================
+    const P0_ADVICE = {
+        'RI': { title: '技术深耕型', desc: '擅长将研究洞察转化为可落地的技术方案，适合走「技术专家」路线。',
+            actions: ['主导一个方法验证或不确定度分析课题，在团队内做可读性强的技术分享',
+                '建立个人技术知识库，将研究结论沉淀为可复用的SOP或检查清单',
+                '每季度输出一份「技术洞察简报」，向管理层展示研究对业务的实际价值'] },
+        'IR': { title: '研究驱动型', desc: '以研究见长，同时能将理论落地为实操，是「研发+应用」的复合人才。',
+            actions: ['选择一项分析或调研产出SOP或培训微课，连接实验室与业务',
+                '为团队建立文献/标准更新摘要机制，用案例教学帮助同事理解新条款',
+                '主动申请参与跨部门技术评审，用研究视角为业务决策提供证据支持'] },
+        'SE': { title: '关系拓展型', desc: '善于通过人际影响力推动业务目标，适合「客户成功」或「业务拓展」方向。',
+            actions: ['牵头客户联合改进小组或价值证明项目，强化信任与续约',
+                '设计客户触点的标准话术与例外升级路径，减少服务摩擦',
+                '在团队内建立「客户故事库」，用成功案例赋能销售与交付团队'] },
+        'ES': { title: '战略协同型', desc: '兼具商业敏锐度与团队领导力，适合「战略运营」或「组织发展」方向。',
+            actions: ['从签约到回款设计跨部门握手指标，推动问责与庆祝机制',
+                '参与合同条款、交付红线与风险缓释库的建设与培训',
+                '每季度组织一次「业务复盘会」，用数据驱动团队学习与迭代'] },
+        'CI': { title: '数据治理型', desc: '擅长用数据审计思维改进流程，是「合规+洞察」的复合型人才。',
+            actions: ['建立抽样规则与异常检测看板，让合规部门成为业务参谋',
+                '牵头一次主数据/指标口径梳理，成为业务与IT之间的可信翻译者',
+                '用数据审计思维改进流程，推动「合规成本—业务收益」对照分析'] },
+        'IC': { title: '系统优化型', desc: '能将复杂研究转化为可执行的规则体系，适合「流程架构」或「质量管理」方向。',
+            actions: ['牵头一次主数据/指标口径梳理，建立业务与IT之间的可信桥梁',
+                '设计「合规沟通体验优化」方案，用更清晰的信息架构呈现政策要求',
+                '参与风控与业务平衡对话，准备「合规成本—业务收益」对照案例'] },
+        'RE': { title: '方案商业化型', desc: '能将技术方案转化为商业价值，是「技术+商务」的桥梁人才。',
+            actions: ['参与一次投标技术卷或方案路演，练习用收益与风险语言包装技术判断',
+                '建立「技术方案商业话术语库」，将技术参数转化为客户可感知的价值',
+                '主动申请参与重点客户技术澄清，用可验证承诺替代口号式销售'] },
+        'ER': { title: '工程可信度型', desc: '在拓展中展示工程可信度，适合「技术销售」或「解决方案架构」方向。',
+            actions: ['参与重点客户技术澄清，用可验证承诺替代口号式销售',
+                '建立「技术方案—客户痛点」映射表，提升提案命中率',
+                '主导一次跨部门技术-商务协同项目，打通从需求到交付的闭环'] },
+        'SC': { title: '服务运营型', desc: '能在服务流程中平衡人情与规则，适合「客户运营」或「服务质量」方向。',
+            actions: ['设计客户触点的标准话术与例外升级路径，减少摩擦',
+                '优化服务流程中的「人情+规则」平衡点，建立可复制的服务标准',
+                '建立客户满意度追踪机制，用数据驱动服务改进'] },
+        'CS': { title: '流程人文型', desc: '在制度执行中注重人文关怀，是「流程OWNER中的温度担当」。',
+            actions: ['在制度更新时组织答疑与情景演练，减少抵触与返工',
+                '设计「流程执行体验优化」方案，让合规要求更易被一线接受',
+                '建立跨部门流程反馈机制，成为业务与合规之间的缓冲带'] },
+        'EA': { title: '提案感染力型', desc: '能让提案更具感染力，适合「品牌传播」或「市场拓展」方向。',
+            actions: ['统一视觉与叙事主线，使技术差异在客户心智中可记忆',
+                '主导一次案例包装或演讲叙事项目，强化专业感',
+                '建立「提案素材库」，将成功案例转化为可复用的叙事模板'] },
+        'AE': { title: '创意商业型', desc: '用品牌与传播思维支持业务拓展，是「创意+商业」的复合人才。',
+            actions: ['用品牌与传播思维支持业务拓展：如案例包装、演讲叙事、展会物料一体化',
+                '主导一次「创意驱动业务增长」实验项目，验证创意对商业结果的贡献',
+                '建立「创意—商业」效果追踪机制，用数据证明创意的价值'] }
+    };
+
+    // ==================== P1: 中频组合（6种）通用+微调 ====================
+    const P1_ADVICE = {
+        'IS': { title: '知识翻译型', desc: '技术部门中的「翻译者」，擅长将复杂研究转化为团队可理解的语言。',
+            actions: ['建立团队知识库，将技术文献转化为「一页纸」摘要',
+                '设计结构化培训模块，用案例教学降低学习门槛',
+                '成为跨部门技术沟通的「桥梁」，用非技术语言解释专业判断'] },
+        'SI': { title: '研究支持型', desc: '支持部门中的「研究者」，用数据洞察提升服务与运营质量。',
+            actions: ['为HR/运营部门建立数据看板，用可视化呈现人员或流程趋势',
+                '主导一次员工体验或客户满意度调研，用研究方法论提升结论可信度',
+                '建立「假设-验证-迭代」的工作习惯，让支持工作更具科学性'] },
+        'ER': { title: '项目推动型', desc: '技术项目的「推动者」，擅长将工程方案落地为商业结果。',
+            actions: ['建立「技术风险-商业收益」对照表，提升决策透明度',
+                '主导一次跨部门项目，练习在资源约束下排序与取舍',
+                '每季度做一次项目复盘，沉淀可复用的「推动 checklist」'] },
+        'RE': { title: '一线领导型', desc: '一线中的「小领导」，用技术权威带动团队执行。',
+            actions: ['建立现场「问题-方案-验证」快速闭环机制',
+                '为团队设计标准化操作模板，同时保留改进反馈通道',
+                '主动承担新人带教，将个人经验转化为团队能力'] },
+        'CS': { title: '流程服务型', desc: '流程+服务的结合，在规范框架内提升客户与员工体验。',
+            actions: ['梳理服务流程中的「摩擦点」，设计标准化改进方案',
+                '建立客户/员工反馈闭环，让投诉变成改进燃料',
+                '参与合规培训设计，用服务思维降低制度执行阻力'] },
+        'SC': { title: '服务规范型', desc: '服务+规范的结合，在人际互动中守住质量底线。',
+            actions: ['设计「服务话术+合规红线」双轨培训材料',
+                '建立客户沟通记录模板，既保留温度又满足审计要求',
+                '成为团队中的「服务标准守护者」，用正面示范替代负面约束'] }
+    };
+
+    // ==================== P2: 低频/罕见组合（12种）通用框架+引导自诊 ====================
+    const P2_ADVICE = {
+        'IA': {
+            title: '研究+艺术', rareReason: '研究+创意，检测行业几乎不需要"创意优先"',
+            ifAppears: '报告可视化、品牌传播、技术写作',
+            framework: {
+                goal: { title: '目标导向 —— 在"规范框架内寻找创新空间"',
+                    text: '您的I（研究）+A（艺术）组合在检测行业较为罕见：A型（创意）与检测行业的"严谨、合规"文化之间存在天然张力。您的破局点不是"变得更合规"，而是"在合规框架内创造差异化价值"——例如报告呈现方式、客户沟通体验、可视化表达。',
+                    action30: '在下次检测报告中，尝试增加1个"客户易读版"（可视化、故事化），收集客户反馈' },
+                layer2: { title: '第2层 Stakeholder —— 用"创意翻译"建立独特价值',
+                    text: '您的A型特质让您擅长用新方式表达复杂信息。在团队中，您可以成为"技术翻译者"：把枯燥的合规数据转化为客户易懂的视觉语言，或设计更好的内部培训材料。您的价值在于"让技术被看见"，而非"做更多技术"。',
+                    action30: '为团队设计1个"检测报告可视化模板"或"客户沟通一页纸"，在部门内试用' },
+                layer3: { title: '第3层 行业地域 —— 把"创意+研究"变成稀缺品牌',
+                    text: '检测行业普遍缺乏"创意表达"能力。您的IA组合如果外化，可以成为"技术传播专家"——用可视化、故事化方式呈现行业洞察，在行业论坛或客户活动中建立"既懂技术又会表达"的独特标签。',
+                    action30: '基于您的研究专长，制作1个"行业洞察可视化作品"（信息图、短视频脚本、互动网页），尝试在行业内部分享' },
+                ai: { title: 'AI协同 —— 用AI放大您的创意效率',
+                    text: 'AI工具可以帮您快速生成可视化方案、设计原型、优化文案。将AI作为"创意副驾驶"，把重复性设计工作交给AI，您专注于"创意方向+专业判断"。',
+                    action30: '选择1个创意任务（如报告可视化设计、培训材料制作），用AI工具生成3个方案，您做最终选择和优化' }
+            }
+        },
+        'AI': {
+            title: '艺术+研究', rareReason: '创意+研究，更罕见',
+            ifAppears: '市场创意、用户体验、创新实验室',
+            framework: {
+                goal: { title: '目标导向 —— 让"创意"成为研究的放大器',
+                    text: '您的AI组合（艺术+研究）极为罕见：您既有创意的直觉，又有研究的严谨。在检测行业，这种组合的最佳落点不是"做更多检测"，而是"让检测更有价值"——用创意方式呈现研究成果，提升技术影响力。',
+                    action30: '选择1项您最近的研究成果，用创意方式重新包装（如信息图、短视频、互动H5），在团队内分享并收集反馈' },
+                layer2: { title: '第2层 Stakeholder —— 成为"技术叙事者"',
+                    text: '团队需要有人把复杂技术讲清楚。您的创意直觉+研究功底让您天然适合这个角色。主动承担技术汇报、客户路演、内部培训中的"叙事设计"工作，建立"技术翻译"个人品牌。',
+                    action30: '为下一次团队技术汇报设计叙事框架（开场钩子-问题-方案-证据-行动），观察听众反应差异' },
+                layer3: { title: '第3层 行业地域 —— 打造"技术创意"稀缺标签',
+                    text: '在检测行业，"既懂技术又会表达"的人是稀缺资源。您的AI组合如果外化，可以成为行业内的"技术传播专家"或"创新顾问"。',
+                    action30: '在LinkedIn或行业社群分享1篇"技术+创意"主题文章，测试市场反应' },
+                ai: { title: 'AI协同 —— AI是您的创意加速器',
+                    text: 'AI可以帮您快速生成视觉方案、优化文案、设计原型。将AI作为"创意副驾驶"，把重复性设计工作交给AI，您专注于创意方向与专业判断的交叉点。',
+                    action30: '用AI工具生成3个不同风格的报告可视化方案，选择最佳方案并手动优化细节' }
+            }
+        },
+        'RA': {
+            title: '实际+艺术', rareReason: '动手+创意，与检测行业"严谨"文化冲突',
+            ifAppears: '设备改进实验、工艺创新、现场改善',
+            framework: {
+                goal: { title: '目标导向 —— 让"动手"带上创意标签',
+                    text: '您的R（实际）+A（艺术）组合意味着您既喜欢动手操作，又有创意直觉。在检测行业，这种组合的最佳落点是"工艺创新"或"现场改善"——用创意方式解决实际问题，而非纯艺术创作。',
+                    action30: '选择1个现场痛点，设计1个"最小可行改进方案"（可以是工具改良、流程简化、可视化标识），验证效果' },
+                layer2: { title: '第2层 Stakeholder —— 成为"现场创意官"',
+                    text: '团队需要有人把枯燥的现场工作变得更有趣、更高效。您的创意直觉可以让您成为团队中的"现场改善催化剂"——用创意方式提升团队士气与工作效率。',
+                    action30: '设计1个"现场5S可视化方案"或"安全提示创意海报"，在班组内试用' },
+                layer3: { title: '第3层 行业地域 —— 把"工艺创意"变成个人品牌',
+                    text: '在检测行业，"既会动手又会创新"的人是稀缺资源。您的RA组合如果外化，可以成为"工艺改善专家"或"现场创新顾问"。',
+                    action30: '整理1个"现场改善案例集"（含前后对比照片/数据），在部门内部分享' },
+                ai: { title: 'AI协同 —— 用AI辅助创意落地',
+                    text: 'AI可以帮您快速生成改善方案原型、优化设计图纸、模拟效果。将AI作为"创意实现工具"，缩短从想法到验证的周期。',
+                    action30: '用AI工具生成3个设备/工具改良草图，选择1个可行性最高的方案进行原型测试' }
+            }
+        },
+        'AR': {
+            title: '艺术+实际', rareReason: '创意+动手，极罕见',
+            ifAppears: '工业设计、原型制作、创意工程',
+            framework: {
+                goal: { title: '目标导向 —— 在"工程"中寻找创意出口',
+                    text: '您的A（艺术）+R（实际）组合极为罕见：您既有创意的想象力，又有动手的执行力。在检测行业，这种组合的最佳落点是"原型开发"或"设备改良"——用工程手段实现创意想法。',
+                    action30: '选择1个工作中的"如果...就更好了"想法，用最低成本制作1个原型或 mockup' },
+                layer2: { title: '第2层 Stakeholder —— 成为"创意工程师"',
+                    text: '团队需要有人把抽象想法变成可触摸的原型。您的动手+创意组合让您天然适合这个角色。主动承担团队中的"原型制作"或"概念验证"工作。',
+                    action30: '为团队中的1个创新想法制作物理或数字原型，展示可行性' },
+                layer3: { title: '第3层 行业地域 —— 打造"创意工程"稀缺品牌',
+                    text: '在检测行业，"既会设计又会动手"的人是稀缺资源。您的AR组合如果外化，可以成为"创新原型专家"或"概念验证顾问"。',
+                    action30: '在行业社群或内部论坛分享1个"从想法到原型"的案例故事' },
+                ai: { title: 'AI协同 —— AI加速从创意到原型',
+                    text: 'AI可以帮您快速生成3D模型、优化设计方案、模拟测试场景。将AI作为"原型加速器"，缩短创意到验证的周期。',
+                    action30: '用AI工具生成1个设备/工具改良的3D模型或渲染图，用于团队沟通' }
+            }
+        },
+        'EA': {
+            title: '推动+艺术', rareReason: '商业+创意，必维偏保守',
+            ifAppears: '创新业务、数字化营销、品牌升级',
+            framework: {
+                goal: { title: '目标导向 —— 用"创意"推动商业变革',
+                    text: '您的E（推动）+A（艺术）组合意味着您既有商业驱动力，又有创意直觉。在必维偏保守的文化中，这种组合的最佳落点是"创新业务探索"或"数字化品牌升级"——用创意方式推动商业目标。',
+                    action30: '选择1个业务痛点，设计1个"创意解决方案"（可以是新服务形态、客户体验升级、品牌传播创新），向主管提案' },
+                layer2: { title: '第2层 Stakeholder —— 成为"商业创意官"',
+                    text: '团队需要有人把商业目标转化为有感染力的表达。您的创意直觉+商业敏锐度让您天然适合这个角色。主动承担提案设计、客户路演、内部变革沟通中的"创意包装"工作。',
+                    action30: '为下一次业务提案设计1个"一页纸视觉方案"，替代传统的文字报告' },
+                layer3: { title: '第3层 行业地域 —— 打造"商业创意"稀缺标签',
+                    text: '在TIC行业，"既懂商业又会创意"的人是稀缺资源。您的EA组合如果外化，可以成为"创新业务负责人"或"品牌升级顾问"。',
+                    action30: '在行业活动或客户交流中，主动分享1个"创意驱动业务"的案例故事' },
+                ai: { title: 'AI协同 —— AI是您的创意商业加速器',
+                    text: 'AI可以帮您快速生成营销方案、优化品牌叙事、设计客户旅程。将AI作为"创意商业副驾驶"，提升商业提案的感染力与效率。',
+                    action30: '用AI工具生成3个不同风格的客户提案方案，选择最佳方案并优化商业逻辑' }
+            }
+        },
+        'AE': {
+            title: '艺术+推动', rareReason: '创意+商业，极罕见',
+            ifAppears: '创业、自由职业、创新咨询',
+            framework: {
+                goal: { title: '目标导向 —— 让"创意"具有商业力量',
+                    text: '您的A（艺术）+E（推动）组合极为罕见：您既有创意的想象力，又有商业的驱动力。在检测行业，这种组合的最佳落点是"内部创业"或"创新项目牵头"——用创意方式推动商业变革。',
+                    action30: '识别1个组织内的"未被满足的需求"，设计1个"最小可行创新方案"并寻找支持者' },
+                layer2: { title: '第2层 Stakeholder —— 成为"创意变革者"',
+                    text: '团队需要有人打破常规、推动创新。您的创意+推动组合让您天然适合这个角色。主动承担团队中的"创新发起人"或"变革推动者"角色。',
+                    action30: '在团队会议中主动提出1个"如果我们可以..."的创新想法，并争取小规模试点' },
+                layer3: { title: '第3层 行业地域 —— 打造"创意创业"个人品牌',
+                    text: '在检测行业，"既会创意又会推动"的人是稀缺资源。您的AE组合如果外化，可以成为"创新顾问"或"内部创业导师"。',
+                    action30: '在行业内部分享1个"从0到1的创新项目"经验，建立"创新推动者"标签' },
+                ai: { title: 'AI协同 —— AI放大创意商业影响力',
+                    text: 'AI可以帮您快速验证商业想法、生成商业计划、优化提案表达。将AI作为"创意商业加速器"，缩短从想法到落地的周期。',
+                    action30: '用AI工具生成1份"创新项目商业计划书"框架，填充您的创意想法并寻求反馈' }
+            }
+        },
+        'SA': {
+            title: '人际+艺术', rareReason: '人际+创意，偏"感性服务"',
+            ifAppears: 'HR文化、员工体验、客户旅程设计',
+            framework: {
+                goal: { title: '目标导向 —— 用"创意"提升人际体验',
+                    text: '您的S（人际）+A（艺术）组合意味着您既善于理解他人，又有创意表达能力。在检测行业，这种组合的最佳落点是"员工体验设计"或"客户旅程优化"——用创意方式提升人际互动质量。',
+                    action30: '选择1个客户触点或员工场景，设计1个"体验微创新"（如欢迎仪式、反馈机制、沟通模板），测试效果' },
+                layer2: { title: '第2层 Stakeholder —— 成为"体验设计师"',
+                    text: '团队需要有人关注"人"的感受。您的创意直觉+人际敏感度让您天然适合这个角色。主动承担团队中的"员工关怀"或"客户体验"设计工作。',
+                    action30: '为团队设计1个"新人入职体验升级方案"或"客户回访创意模板"，在部门内试用' },
+                layer3: { title: '第3层 行业地域 —— 打造"人文创意"稀缺标签',
+                    text: '在TIC行业，"既懂人又会设计"的人是稀缺资源。您的SA组合如果外化，可以成为"员工体验顾问"或"客户旅程设计师"。',
+                    action30: '在HR或客户部门分享1个"体验设计案例"，建立"人文设计"个人品牌' },
+                ai: { title: 'AI协同 —— AI辅助体验设计',
+                    text: 'AI可以帮您快速生成体验方案、优化沟通文案、设计互动流程。将AI作为"体验设计副驾驶"，提升创意产出效率。',
+                    action30: '用AI工具生成3个不同风格的客户沟通模板，选择最佳方案并优化情感表达' }
+            }
+        },
+        'AS': {
+            title: '艺术+人际', rareReason: '创意+人际，偏"艺术治疗"',
+            ifAppears: '心理咨询、教练、团队建设',
+            framework: {
+                goal: { title: '目标导向 —— 用"创意"深化人际连接',
+                    text: '您的A（艺术）+S（人际）组合意味着您既有创意表达能力，又善于理解他人。在检测行业，这种组合的最佳落点是"团队建设"或"员工发展"——用创意方式促进团队凝聚力与个人成长。',
+                    action30: '设计1个"团队创意工作坊"（如视觉复盘、故事分享会、角色扮演），在团队内试点' },
+                layer2: { title: '第2层 Stakeholder —— 成为"团队创意引导者"',
+                    text: '团队需要有人用非传统方式促进沟通与协作。您的创意+人际组合让您天然适合这个角色。主动承担团队中的"团建设计"或"沟通创新"工作。',
+                    action30: '为下一次团队会议设计1个"创意开场"或"视觉复盘"环节，观察参与度变化' },
+                layer3: { title: '第3层 行业地域 —— 打造"创意人文"个人品牌',
+                    text: '在检测行业，"既会创意又懂人心"的人是稀缺资源。您的AS组合如果外化，可以成为"团队教练"或"组织发展顾问"。',
+                    action30: '在行业内部分享1个"创意促进团队协作"的案例，建立"创意人文"标签' },
+                ai: { title: 'AI协同 —— AI辅助创意团队活动',
+                    text: 'AI可以帮您快速生成团建方案、设计互动游戏、优化沟通材料。将AI作为"创意团队活动助手"，提升活动设计效率。',
+                    action30: '用AI工具生成3个不同主题的团建活动方案，选择1个在团队内实施' }
+            }
+        },
+        'CA': {
+            title: '常规+艺术', rareReason: '规范+创意，内在冲突',
+            ifAppears: '流程可视化、制度设计、合规传播',
+            framework: {
+                goal: { title: '目标导向 —— 让"规范"更有温度',
+                    text: '您的C（常规）+A（艺术）组合意味着您既重视规范，又有创意直觉。这种看似冲突的组合，实际上是「流程可视化」或「合规传播」的绝佳配置——用创意方式让枯燥的规范变得易懂、易执行。',
+                    action30: '选择1项团队内执行的规范/制度，用创意方式重新设计呈现形式（如信息图、短视频、互动网页），测试接受度' },
+                layer2: { title: '第2层 Stakeholder —— 成为"合规创意官"',
+                    text: '团队需要有人把枯燥的合规要求变得可接受。您的创意直觉+规范意识让您天然适合这个角色。主动承担团队中的"制度宣导"或"合规培训"设计工作。',
+                    action30: '为下一次合规培训设计1个"互动式学习方案"（如情景模拟、游戏化测试、视觉手册），替代传统宣讲' },
+                layer3: { title: '第3层 行业地域 —— 打造"规范创意"稀缺标签',
+                    text: '在TIC行业，"既懂规范又会表达"的人是稀缺资源。您的CA组合如果外化，可以成为"合规传播专家"或"制度设计师"。',
+                    action30: '在行业内部分享1个"让规范变有趣"的案例，建立"规范创意"个人品牌' },
+                ai: { title: 'AI协同 —— AI辅助合规创意表达',
+                    text: 'AI可以帮您快速生成可视化方案、优化培训材料、设计互动内容。将AI作为"合规创意副驾驶"，提升制度传播效果。',
+                    action30: '用AI工具生成1个"合规要求可视化信息图"，在团队内试用并收集反馈' }
+            }
+        },
+        'AC': {
+            title: '艺术+常规', rareReason: '创意+规范，内在冲突最大',
+            ifAppears: '几乎不可能在必维',
+            framework: {
+                goal: { title: '目标导向 —— 在"最大冲突"中寻找独特价值',
+                    text: '您的A（艺术）+C（常规）组合是检测行业中极为罕见的「最大冲突型」：创意与规范看似水火不容。但正是这种张力，让您可能成为「制度创新者」——用创意方式优化僵化流程，或用规范框架保护创新成果。',
+                    action30: '识别1个您认为"过于僵化"的团队流程，设计1个"最小可行优化方案"，用数据证明改进价值' },
+                layer2: { title: '第2层 Stakeholder —— 成为"制度创新者"',
+                    text: '团队需要有人打破"非此即彼"的思维。您的创意+规范组合让您天然适合「在规则内创新」的角色。主动承担团队中的"流程优化"或"制度创新"推动工作。',
+                    action30: '在团队会议中提出1个"规则内的创新"想法，并争取小规模试点机会' },
+                layer3: { title: '第3层 行业地域 —— 打造"冲突转化"稀缺品牌',
+                    text: '在检测行业，"既会创新又懂规则"的人是稀缺资源。您的AC组合如果外化，可以成为"制度创新顾问"或"流程变革专家"。',
+                    action30: '在行业内部分享1个"在规范内创新"的案例，建立"冲突转化者"标签' },
+                ai: { title: 'AI协同 —— AI辅助规范与创新平衡',
+                    text: 'AI可以帮您快速分析流程瓶颈、生成优化方案、模拟变革效果。将AI作为"制度创新分析工具"，用数据支撑您的创意提案。',
+                    action30: '用AI工具分析1个团队流程的数据瓶颈，生成3个优化方案，选择最佳方案提案' }
+            }
+        },
+        'CE': {
+            title: '常规+推动', rareReason: '规范+商业，内在张力',
+            ifAppears: '风控合规、合同管理、运营优化',
+            framework: {
+                goal: { title: '目标导向 —— 让"规范"成为商业助推器',
+                    text: '您的C（常规）+E（推动）组合意味着您既重视规范，又有商业驱动力。这种组合的最佳落点是「风控合规」或「运营优化」——用规范框架保障商业目标的实现，而非阻碍。',
+                    action30: '选择1个业务拓展场景，设计1个"合规-商业双赢方案"（如快速审批通道、风险分级管理），向主管提案' },
+                layer2: { title: '第2层 Stakeholder —— 成为"商业风控官"',
+                    text: '团队需要有人平衡「做业务」与「守底线」。您的规范意识+商业敏锐度让您天然适合这个角色。主动承担团队中的「合同审核」「风险评估」或「合规培训」工作。',
+                    action30: '为销售/业务团队设计1个"合规红线速查卡"或"风险自检清单"，提升业务合规效率' },
+                layer3: { title: '第3层 行业地域 —— 打造"规范商业"稀缺标签',
+                    text: '在TIC行业，"既懂商业又守规范"的人是稀缺资源。您的CE组合如果外化，可以成为「风控顾问」或「合规商业专家」。',
+                    action30: '在行业社群或客户交流中，分享1个"合规驱动商业信任"的案例故事' },
+                ai: { title: 'AI协同 —— AI辅助合规商业决策',
+                    text: 'AI可以帮您快速检索法规、比对合同条款、生成风险评估报告。将AI作为「合规商业副驾驶」，提升决策效率与准确性。',
+                    action30: '用AI工具生成1份"业务场景合规检查清单"，在团队内试用并迭代' }
+            }
+        },
+        'EC': {
+            title: '推动+常规', rareReason: '商业+规范，内在张力',
+            ifAppears: '项目管理、运营总监、战略执行',
+            framework: {
+                goal: { title: '目标导向 —— 用"规范"保障商业落地',
+                    text: '您的E（推动）+C（常规）组合意味着您既有商业驱动力，又重视规范执行。这种组合的最佳落点是「项目管理」或「战略执行」——用规范框架确保商业目标的可交付性。',
+                    action30: '选择1个正在推进的项目，设计1个"里程碑-风险-合规"三位一体追踪表，提升项目可控性' },
+                layer2: { title: '第2层 Stakeholder —— 成为"执行架构师"',
+                    text: '团队需要有人把商业目标转化为可执行的步骤。您的推动+规范组合让您天然适合这个角色。主动承担团队中的「项目计划」「流程设计」或「执行监控」工作。',
+                    action30: '为团队设计1个"项目执行标准模板"（含里程碑、风险点、合规检查项），在部门内推广' },
+                layer3: { title: '第3层 行业地域 —— 打造"执行专家"稀缺标签',
+                    text: '在TIC行业，"既会推动又懂规范"的人是稀缺资源。您的EC组合如果外化，可以成为「项目管理专家」或「战略执行顾问」。',
+                    action30: '在行业活动或内部分享中，展示1个"规范驱动高效执行"的项目案例' },
+                ai: { title: 'AI协同 —— AI辅助项目规范执行',
+                    text: 'AI可以帮您快速生成项目计划、追踪进度、预警风险。将AI作为「项目执行副驾驶」，提升管理效率与规范性。',
+                    action30: '用AI工具生成1个"项目风险预警模型"或"进度追踪看板"，在团队内试用' }
+            }
+        }
+    };
+
+    // ==================== 判断组合优先级 ====================
+    function getPriority(p0Key) {
+        if (P0_ADVICE[p0Key]) return { level: 'P0', label: '高频组合', badgeClass: 'badge-p0' };
+        if (P1_ADVICE[p0Key]) return { level: 'P1', label: '中频组合', badgeClass: 'badge-p1' };
+        if (P2_ADVICE[p0Key]) return { level: 'P2', label: '低频/罕见组合', badgeClass: 'badge-p2' };
+        return { level: 'P0', label: '高频组合', badgeClass: 'badge-p0' };
+    }
+
+    // ==================== 岗位 x 岗位性质 x 目标 交叉建议 ====================
+    function isFrontLine(job) {
+        return FRONT_LINE_JOBS.includes(job);
+    }
+
+    function getCrossAdvice(job, roleType, careerGoal, topCode, secondCode) {
+        const frontLine = isFrontLine(job);
+        const isExpertGoal = careerGoal === 'expert';
+        let advice = [];
+        if (roleType === 'individual' && isExpertGoal) {
+            advice.push({
+                tag: '个人贡献者 → 专家岗',
+                text: `您当前是个人贡献者，目标是专家岗。建议围绕「${hollandCodes[topCode].name}」与「${hollandCodes[secondCode].name}」建立个人技术品牌：选择1个组织级难题（如${frontLine ? '客户交付质量' : '运营效率'}），用半年时间产出可验证的方法论成果（如白皮书、SOP、工具模板），并在团队/部门内做结构化分享。`
+            });
+        } else if (roleType === 'individual' && !isExpertGoal) {
+            advice.push({
+                tag: '个人贡献者 → 管理岗',
+                text: `您当前是个人贡献者，目标是管理岗。建议在深耕「${hollandCodes[topCode].name}」的同时，刻意练习「通过他人贡献」：主动带1个新人或虚拟小组，建立「目标-辅导-反馈」节奏；同时参与跨部门项目，积累协调资源与化解冲突的经验。`
+            });
+        } else if (roleType === 'manager' && isExpertGoal) {
+            advice.push({
+                tag: '管理岗 → 专家岗',
+                text: `您当前是管理岗，目标是专家岗。建议在管理职责中保留「专业纵深」：每周固定时间做深度技术工作（如审阅核心报告、参与方法验证），避免完全脱离一线；同时把管理经验转化为可复用的「管理工具箱」（如会议模板、决策框架），成为「懂管理的专家」。`
+            });
+        } else {
+            advice.push({
+                tag: '管理岗 → 更高管理岗',
+                text: `您当前是管理岗，目标是更高管理岗。建议从「管团队」升级到「建体系」：梳理您负责领域的「输入-过程-输出」标准，推动1项可量化的效率改进；同时扩展外部影响力，参与行业协会或标准制定，让个人品牌超越组织边界。`
+            });
+        }
+        if (frontLine) {
+            advice.push({
+                tag: '价值链视角',
+                text: `作为${job}相关岗位，主动绘制您所参与业务的价值链地图：从线索、方案、合同、交付、开票到售后，标出关键接口人与风险点；每两个月与上下游环节各做1次结构化沟通（带着问题清单），理解各环节KPI与约束，提升您在客户与内部协作中的「系统视角」。`
+            });
+        } else {
+            advice.push({
+                tag: '业务理解深化',
+                text: `在${job}的支持角色上，安排「业务旁听计划」：例如旁听销售/项目经理例会、阅读典型标书与项目复盘、与一线同事做短访谈，整理「业务如何赚钱、风险在哪里、您所在岗位如何放大价值」一页纸；用业务语言重写一份您日常支持的工作说明，增强跨部门对话质量。`
+            });
+        }
+        advice.push({
+            tag: 'AI 协同',
+            text: `将AI作为日常工作的「副驾驶」：针对「${job}」场景，固定1个高频任务（如${frontLine ? '标准条款比对、报告框架起草' : '会议纪要提炼、数据异常解释'}）用企业允许的AI工具建立模板与提示词库；每月做一次小复盘：哪些输出仍需人工终审、哪些已可稳定提效，逐步形成可分享的团队微流程。`
+        });
+        advice.push({
+            tag: '影响力建设',
+            text: `在VUCA环境下，影响力比职权更持久。建议您每季度完成1件「可展示作品」：内部可以是方法论分享、流程改进案例、跨部门协作成果；外部可以是行业社群发言、标准意见征集、最佳实践交流。用「作品」代替「汇报」，让影响力自然生长。`
+        });
+        return advice;
+    }
+
+    // ==================== 工具函数 ====================
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    function getSortedScoreLines(scores) {
+        const order = ['R','I','A','S','E','C'];
+        const list = order.map(code => ({ code, pct: Math.round((scores[code] / 50) * 100) }));
+        list.sort((a, b) => b.pct - a.pct);
+        return list;
+    }
+    function saveQuizData(data) {
+        localStorage.setItem('bv_quiz_completed', 'true');
+        localStorage.setItem('bv_quiz_data', JSON.stringify(data));
+    }
+    function loadQuizData() {
+        const completed = localStorage.getItem('bv_quiz_completed');
+        const data = localStorage.getItem('bv_quiz_data');
+        if (completed === 'true' && data) return JSON.parse(data);
+        return null;
+    }
+    function clearQuizData() {
+        localStorage.removeItem('bv_quiz_completed');
+        localStorage.removeItem('bv_quiz_data');
+    }
+
+    // ==================== 渲染结果页 ====================
+        // ==================== 渲染结果页（精简版 05 · 岗位四类）====================
+    function renderResult(data) {
+        document.body.classList.add('bv-report-view');
+        const { userPosition, userRoleType, userCareerGoal, scores, topCode, secondCode, thirdCode } = data;
+        const sortedScores = getSortedScoreLines(scores);
+        const p0Key = topCode + secondCode;
+        const priority = getPriority(p0Key);
+        const p0Data = P0_ADVICE[p0Key];
+        const p1Data = P1_ADVICE[p0Key];
+        const p2Data = P2_ADVICE[p0Key];
+        const crossAdvice = getCrossAdvice(userPosition, userRoleType, userCareerGoal, topCode, secondCode);
+        const artisticTopTwo = topCode === 'A' || secondCode === 'A';
+
+        let comboSection = '';
+        if (priority.level === 'P0' && p0Data) {
+            comboSection = `
+                <div class="report-section">
+                    <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
+                    <p><strong>组合类型：</strong>${p0Data.title}</p>
+                    <p><strong>核心特质：</strong>${p0Data.desc}</p>
+                    <p style="margin-top:12px"><strong>建议行动：</strong></p>
+                    <ul>${p0Data.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                </div>`;
+        } else if (priority.level === 'P1' && p1Data) {
+            comboSection = `
+                <div class="report-section">
+                    <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
+                    <p><strong>组合类型：</strong>${p1Data.title}</p>
+                    <p><strong>核心特质：</strong>${p1Data.desc}</p>
+                    <p style="margin-top:12px"><strong>建议行动：</strong></p>
+                    <ul>${p1Data.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                    <div class="rare-note" style="margin-top:15px">
+                        <p style="font-size:0.9rem;color:var(--text-gray)">💡 此组合属于中频率组合（占15-20%），建议结合您的岗位性质与职业目标进行微调。如需更深度解读，可在课后预约1v1咨询。</p>
+                    </div>
+                </div>`;
+        } else if (priority.level === 'P2' && p2Data) {
+            const fw = p2Data.framework;
+            comboSection = `
+                <div class="report-section">
+                    <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
+                    <div class="rare-note">
+                        <h4>⚠️ 罕见组合说明</h4>
+                        <p><strong>组合名称：</strong>${p2Data.title} · ${hollandCodes[topCode].name}+${hollandCodes[secondCode].name}</p>
+                        <p><strong>为什么罕见：</strong>${p2Data.rareReason}</p>
+                        <p><strong>如果出现，适合场景：</strong>${p2Data.ifAppears}</p>
+                    </div>
+                    <p style="margin-top:15px;color:var(--text-gray);font-size:0.9rem">以下四条建议采用「通用框架+引导自诊」模式，建议您课后与礼徳咨询顾问进行深度解读。</p>
+                    <div style="margin-top:20px">
+                        <div class="recommendation-card" style="border-left-color:var(--bv-blue)">
+                            <div class="rec-title">🎯 建议1：${fw.goal.title}</div>
+                            <div class="rec-content">${fw.goal.text}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.goal.action30}</div>
+                        </div>
+                        <div class="recommendation-card" style="border-left-color:#2c5282">
+                            <div class="rec-title">🎯 建议2：${fw.layer2.title}</div>
+                            <div class="rec-content">${fw.layer2.text}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.layer2.action30}</div>
+                        </div>
+                        <div class="recommendation-card" style="border-left-color:#7c3aed">
+                            <div class="rec-title">🎯 建议3：${fw.layer3.title}</div>
+                            <div class="rec-content">${fw.layer3.text}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.layer3.action30}</div>
+                        </div>
+                        <div class="recommendation-card" style="border-left-color:var(--ai-purple)">
+                            <div class="rec-title">🤖 建议4：${fw.ai.title}</div>
+                            <div class="rec-content">${fw.ai.text}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.ai.action30}</div>
+                        </div>
+                    </div>
+                </div>`;
+        } else {
+            comboSection = `
+                <div class="report-section">
+                    <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
+                    <p>您的前两位组合「${topCode}${secondCode}」属于较为独特的组合。建议您结合前两位「${topCode}${secondCode}」的核心特质，同时关注第三位「${hollandCodes[thirdCode].name}」如何在工作中作为补充优势发挥作用。</p>
+                </div>`;
+        }
+
+        const app = document.getElementById('app');
+        app.innerHTML = `
+            <div class="result-section" style="display:block">
+                <div class="logo">BV</div>
+                <div style="text-align:center">
+                    <div style="margin-bottom:15px">
+                        <span class="tag-badge tag-primary">岗位：${userPosition}</span>
+                        <span class="tag-badge tag-accent">性质：${ROLE_TYPES[userRoleType]}</span>
+                        <span class="tag-badge tag-purple">目标：${CAREER_GOALS[userCareerGoal]}</span>
+                    </div>
+                    <h2 style="color:var(--primary);margin-bottom:10px">您的霍兰德职业兴趣代码是</h2>
+                    <div class="result-code">${topCode}${secondCode}${thirdCode}</div>
+                    <p style="color:var(--text-gray);margin-bottom:8px">${hollandCodes[topCode].name} + ${hollandCodes[secondCode].name} + ${hollandCodes[thirdCode].name}</p>
+                    ${artisticTopTwo ? `
+                    <div class="artistic-note">
+                        <strong style="color:var(--ai-purple)">关于艺术型（A）出现在您的主导或次要兴趣：</strong>
+                        这一特质往往表明您更愿意进行艺术化表达，喜欢创意，不拘泥于常规的思维。
+                        <span style="display:block;margin-top:10px">（若在实际工作中与日常岗位要求关联度不高，可将此特质更多作为职场减压与自我滋养的方式，而不必强压为「直接提升生产力」的唯一路径。）</span>
+                    </div>` : ''}
+                </div>
+
+                <div class="result-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">兴趣分布雷达图</div>
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="scores-container">
+                        <div class="chart-title">各维度得分（高→低）</div>
+                        ${sortedScores.map(({ code, pct }) => `
+                            <div class="score-item">
+                                <div class="score-letter">${code}</div>
+                                <div class="score-bar-bg"><div class="score-bar-fill" style="width: ${pct}%"></div></div>
+                                <div>${pct}%</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                ${comboSection}
+
+                <div class="report-section">
+                    <h3>💡 基于岗位 × 性质 × 目标的定制化建议</h3>
+                    <p style="color:var(--text-gray); font-size:0.92rem; line-height:1.7; margin-bottom:22px">
+                        以下四条建议已根据您的<strong>岗位</strong>（${userPosition}）、<strong>岗位性质</strong>（${ROLE_TYPES[userRoleType]}）、<strong>职业目标</strong>（${CAREER_GOALS[userCareerGoal]}）与<strong>霍兰德代码</strong>组合生成。
+                    </p>
+                    ${crossAdvice.map((item, i) => `
+                        <div class="recommendation-card">
+                            <div class="rec-title">${i + 1}. ${item.tag}</div>
+                            <div class="rec-content">${item.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- TOP模型衔接 -->
+                <div class="report-section">
+                    <h3>🔺 TOP模型：您的职业巅峰状态</h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin:15px 0">
+                        <div style="background:linear-gradient(135deg,#e6f0f8,#fff);border-radius:16px;padding:20px;text-align:center">
+                            <div style="font-size:2rem;margin-bottom:10px">🚀</div>
+                            <h4 style="color:var(--bv-blue);margin-bottom:8px">T - Talent</h4>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${hollandCodes[topCode].name} + ${hollandCodes[secondCode].name}<br>您的天赋在于「${p0Data ? p0Data.title.split('型')[0] : '专业'}」</p>
+                        </div>
+                        <div style="background:linear-gradient(135deg,#fff8e6,#fff);border-radius:16px;padding:20px;text-align:center">
+                            <div style="font-size:2rem;margin-bottom:10px">🏢</div>
+                            <h4 style="color:var(--accent);margin-bottom:8px">O - Organizational Needs</h4>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${userPosition}<br>组织需要「${isFrontLine(userPosition) ? '交付+客户' : '效率+职能协同'}」人才</p>
+                        </div>
+                        <div style="background:linear-gradient(135deg,var(--ai-light),#fff);border-radius:16px;padding:20px;text-align:center">
+                            <div style="font-size:2rem;margin-bottom:10px">❤️</div>
+                            <h4 style="color:var(--ai-purple);margin-bottom:8px">P - Passion</h4>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${CAREER_GOALS[userCareerGoal]}<br>您热爱「${userCareerGoal === 'expert' ? '专业深耕' : '带领团队'}」</p>
+                        </div>
+                    </div>
+                    <div style="background:linear-gradient(135deg,var(--bv-light),#fff);border-radius:16px;padding:20px;margin-top:15px;border-left:4px solid var(--bv-blue)">
+                        <p style="color:var(--text-gray);margin:0;line-height:1.8">
+                            <strong style="color:var(--primary)">您的TOP交汇点：</strong>成为「${userPosition}领域的${userCareerGoal === 'expert' ? '专家' : '管理者'}」——用${hollandCodes[topCode].name}建立专业壁垒，用${hollandCodes[secondCode].name}创造差异化价值，在组织需求与个人热情之间找到可持续的发展路径。
+                        </p>
+                    </div>
+                </div>
+
+                ${priority.level === 'P2' ? `
+                <div class="report-section" style="background:linear-gradient(135deg,#faf5ff,#fff);border:1px solid var(--ai-purple)">
+                    <h3 style="border-bottom-color:var(--ai-purple)">📌 课后建议</h3>
+                    <p>您的组合「${topCode}${secondCode}」属于低频/罕见组合（占5-10%），以上报告采用「通用框架+引导自诊」模式生成。</p>
+                    <p style="margin-top:10px"><strong>建议您：</strong></p>
+                    <ul>
+                        <li>仔细阅读上述四条建议，标记出与您实际工作场景最契合的1-2条</li>
+                        <li>尝试完成其中至少1个「30天行动」</li>
+                        <li>在课后与礼徳咨询顾问预约深度解读，针对您的具体情况进行个性化调整</li>
+                    </ul>
+                </div>
+                ` : ''}
+
+                <!-- CTA：礼徳咨询顾问联系方式 -->
+                <div class="cta-section">
+                    <h3>🎯 想获得更深度的发展规划？</h3>
+                    <p>本报告为课堂体验版，包含霍兰德组合分析、定制化建议与TOP模型衔接。</p>
+                    <p>如需完整版报告（含发展路线图、能力缺口自查、1v1教练辅导），请联系礼徳咨询顾问：</p>
+                    <div style="margin:20px 0;padding:20px;background:#fff;border-radius:16px;text-align:left;max-width:500px;margin-left:auto;margin-right:auto">
+                        <p style="font-size:1.1rem;color:var(--primary);font-weight:700;margin-bottom:12px">Shirley Sun 孙静</p>
+                        <p style="color:var(--text-gray);margin-bottom:8px">📞 电话：021-65668250</p>
+                        <p style="color:var(--text-gray);margin-bottom:8px">📱 手机：139 1749 3345</p>
+                        <p style="color:var(--text-gray);margin:0">✉️ 邮箱：shirley.sun@leader-consulting.com</p>
+                    </div>
+                    <a href="mailto:shirley.sun@leader-consulting.com?subject=预约必维职业发展规划深度咨询" class="cta-btn">预约1v1深度咨询</a>
+                </div>
+
+                <div class="btn-group" style="text-align:center; margin-top:30px">
+                    <button class="btn-outline" onclick="clearAndRestart()">重新测评</button>
+                    <button class="btn-primary" onclick="window.print()">保存报告</button>
+                </div>
+            </div>
+        `;
+
+        const rOrder = ['R','I','A','S','E','C'];
+        const radarVals = rOrder.map(c => Math.round((scores[c] / 50) * 100));
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['R实际','I研究','A艺术','S社会','E企业','C常规'],
+                datasets: [{
+                    data: radarVals,
+                    backgroundColor: 'rgba(0,85,164,0.2)',
+                    borderColor: '#0055a4',
+                    pointBackgroundColor: '#d4af37',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, scales: { r: { beginAtZero: true, max: 100 } } }
+        });
+    }
+
+    // ==================== 渲染首页 ====================
+    function renderIntro() {
+        document.body.classList.remove('bv-report-view');
+        const app = document.getElementById('app');
+        app.innerHTML = `
+            <div class="intro-section">
+                <div class="logo">BV</div>
+                <h1>必维职业发展规划测评</h1>
+                <p class="subtitle">在VUCA时代探索您的可持续职业发展路径</p>
+
+                <div class="context-banner">
+                    <h3>🎯 培训背景与核心理念</h3>
+                    <p>在VUCA（易变、不确定、复杂、模糊）环境下，必维正在经历组织架构变革。本测评帮助您理解：<strong>无论是否有晋升机会，您都可以通过改变贡献方式来建立个人影响力，实现可持续的职业发展。</strong></p>
+                    <p style="margin-top: 10px; font-weight: 600;">💡 核心洞察：在职场中，影响力比职权更持久。真正的职业安全感来自于您能够影响他人、推动改变、创造价值的能力，而非职位头衔。</p>
+                    <p style="margin-top: 12px;">请如实作答，答案无对错之分。</p>
+                </div>
+
+                <div class="intro-card">
+                    <h2>💡 TOP模型：职业巅峰状态</h2>
+                    <p>可持续职业发展的关键在于找到三个要素的交汇点：</p>
+                    <div class="top-model">
+                        <h4>您的职业巅峰状态 =</h4>
+                        <ul>
+                            <li><strong>T - Talent（天赋技能）：</strong>您天生擅长且乐在其中的能力</li>
+                            <li><strong>O - Organizational Needs（组织需求）：</strong>必维当前及未来需要的能力</li>
+                            <li><strong>P - Passion（工作热情）：</strong>您真正热爱并愿意投入的工作内容</li>
+                        </ul>
+                    </div>
+                    <div class="influence-highlight">
+                        <h4>🌟 为什么影响力是职业长久的关键？</h4>
+                        <p>组织变革中，职位可能调整，部门可能重组，但<strong>个人的影响力是您可以随身携带的"职业资产"</strong>。通过改变贡献方式——从依靠他人到独立贡献，再到通过他人贡献，最终影响组织战略——您可以在任何岗位上持续扩大影响力半径，成为组织中不可或缺的"关键节点"。</p>
+                    </div>
+                    <div class="ai-highlight">
+                        <h4>🤖 AI时代的影响力建设</h4>
+                        <p>人工智能正在重塑检验检测认证行业。善于利用AI工具提升效率、创造新价值的人，将在新一轮职业洗牌中占据优势。<strong>将AI作为能力放大器，而非威胁</strong>，是当代职场人建立影响力的关键策略。</p>
+                    </div>
+                    <p>本测评通过<strong>霍兰德职业兴趣理论</strong>帮助您识别个人天赋与热情，结合您的岗位、岗位性质与职业目标，为您提供定制化的职业发展建议。</p>
+                    <div class="vuca-note">
+                        <h4>⚡ 关注"贡献方式"而非"职位"</h4>
+                        <p>在组织变革期，职位边界变得模糊，但组织始终需要价值创造。通过调整贡献方式（依靠他人→独立→通过他人→战略层面），您可以在当前岗位上创造更大影响力，实现个人成长与组织发展的双赢。</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="jobCategorySelect">请选择您当前的岗位</label>
+                        <select id="jobCategorySelect" required aria-label="岗位">
+                            <option value="">请选择岗位</option>
+                            ${JOB_CATEGORIES.map(j => `<option value="${j}">${j}</option>`).join('')}
+                        </select>
+                        <p class="input-hint">请从以上<strong>四类</strong>中选择最贴近您当前工作性质的一项。说明：③含支持项目交付与内部运营（如 Project Manager、Coordinator、Operation Support Specialist、Scheduler 等）；④含 HR / IT / 财务 / 采购 / 行政等管理职能与支持。</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>请选择您的岗位性质</label>
+                        <div class="radio-group">
+                            <div class="radio-card" data-role="individual">
+                                <span class="radio-title">个人贡献者</span>
+                                <span class="radio-desc">以独立专业工作为主<br>不直接带团队</span>
+                            </div>
+                            <div class="radio-card" data-role="manager">
+                                <span class="radio-title">管理岗</span>
+                                <span class="radio-desc">带团队或负责部门管理<br>有人员管理职责</span>
+                            </div>
+                        </div>
+                        <p class="input-hint">请选择您当前的岗位性质。</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>请选择您的职业目标</label>
+                        <div class="radio-group">
+                            <div class="radio-card" data-goal="expert">
+                                <span class="radio-title">专家岗</span>
+                                <span class="radio-desc">深耕专业领域<br>成为技术/业务专家</span>
+                            </div>
+                            <div class="radio-card" data-goal="manager">
+                                <span class="radio-title">管理岗</span>
+                                <span class="radio-desc">拓展管理半径<br>承担更大管理责任</span>
+                            </div>
+                        </div>
+                        <p class="input-hint">请选择您未来3-5年的职业发展方向。</p>
+                    </div>
+                </div>
+                <button class="btn-primary" id="startQuizBtn" disabled>开始测评</button>
+            </div>
+        `;
+
+        let selectedRole = null;
+        let selectedGoal = null;
+
+        document.querySelectorAll('.radio-card[data-role]').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.radio-card[data-role]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedRole = card.dataset.role;
+                checkStart();
+            });
+        });
+
+        document.querySelectorAll('.radio-card[data-goal]').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.radio-card[data-goal]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedGoal = card.dataset.goal;
+                checkStart();
+            });
+        });
+
+        const jobSelect = document.getElementById('jobCategorySelect');
+        const startBtn = document.getElementById('startQuizBtn');
+
+        function checkStart() {
+            startBtn.disabled = !(jobSelect.value && selectedRole && selectedGoal);
+        }
+
+        jobSelect.addEventListener('change', checkStart);
+        startBtn.addEventListener('click', () => {
+            if (jobSelect.value && selectedRole && selectedGoal) {
+                startQuiz(jobSelect.value, selectedRole, selectedGoal);
+            }
+        });
+    }
+
+    // ==================== 测评流程 ====================
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let quizScores = { R:0, I:0, A:0, S:0, E:0, C:0 };
+    let quizUserPos = '';
+    let quizUserRole = '';
+    let quizUserGoal = '';
+
+    function startQuiz(pos, role, goal) {
+        quizUserPos = pos;
+        quizUserRole = role;
+        quizUserGoal = goal;
+        currentQuestions = shuffleArray([...questions]);
+        currentIndex = 0;
+        quizScores = { R:0, I:0, A:0, S:0, E:0, C:0 };
+        renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+        document.body.classList.remove('bv-report-view');
+        const app = document.getElementById('app');
+        if (currentIndex >= currentQuestions.length) {
+            const scores = quizScores;
+            const sorted = Object.keys(scores).sort((a,b) => scores[b]-scores[a]);
+            const resultData = {
+                userPosition: quizUserPos,
+                userRoleType: quizUserRole,
+                userCareerGoal: quizUserGoal,
+                scores: scores,
+                topCode: sorted[0],
+                secondCode: sorted[1],
+                thirdCode: sorted[2],
+                completedAt: new Date().toISOString()
+            };
+            saveQuizData(resultData);
+            initApp();
+            return;
+        }
+
+        const q = currentQuestions[currentIndex];
+        const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
+        app.innerHTML = `
+            <div class="quiz-section" style="display:block">
+                <div class="progress-container">
+                    <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+                    <div style="text-align:center; margin-top:10px">${currentIndex+1} / ${currentQuestions.length}</div>
+                </div>
+                <div class="question-card">
+                    <div class="question-text">${q.text}</div>
+                    <div class="options-container" id="optionsContainer"></div>
+                </div>
+            </div>
+        `;
+        const optsContainer = document.getElementById('optionsContainer');
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `${opt.text}<span style="opacity:0.6">${opt.score}分</span>`;
+            btn.onclick = () => {
+                quizScores[q.code] += opt.score;
+                currentIndex++;
+                renderQuizQuestion();
+            };
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function clearAndRestart() {
+        clearQuizData();
+        initApp();
+    }
+
+    function initApp() {
+        const completedData = loadQuizData();
+        if (!completedData) {
+            renderIntro();
+        } else {
+            renderResult(completedData);
+        }
+    }
+
+    window.clearAndRestart = clearAndRestart;
+    initApp();
+</script>
+</body>
+</html>

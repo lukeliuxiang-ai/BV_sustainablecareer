@@ -1,0 +1,46 @@
+/* 与 influence01.html 一致：左上角装饰色块 + 右上角 Logo（仅作用于 .slide-container 内） */
+
+.slide-container .red-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    z-index: 10;
+}
+
+.slide-container .red-corner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* TOP.html：色块为单层 <img class="red-corner"> */
+.slide-container > img.red-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    z-index: 10;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+}
+
+.slide-container .logo {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    width: auto;
+    height: auto;
+    z-index: 10;
+}
+
+.slide-container .logo img {
+    height: 100px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}

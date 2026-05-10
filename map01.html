@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百年生涯 · 影响力行动卡 | map01</title>
+    <link rel="stylesheet" href="deck-branding.css">
+    <link rel="stylesheet" href="map-slide.css">
+</head>
+<body class="iac-blank-page">
+    <div class="deck-stack map-deck">
+        <div class="slide-container" id="pdf-capture-root">
+            <div class="red-corner">
+                <img src="images/colorpatch.png" alt="装饰">
+            </div>
+
+            <div class="logo">
+                <img src="images/lh_logo.png" alt="礼淮咨询 Logo">
+            </div>
+
+            <div class="iac-wrap">
+                <p class="iac-career-title" lang="zh-CN">百年生涯 <span class="iac-career-title__en" lang="en">Sustainable Career</span></p>
+
+                <header class="iac-header">
+                    <h1>影响力行动卡</h1>
+                    <p class="iac-sub">从洞察到行动 · 30天影响力提升计划</p>
+                </header>
+
+                <div class="iac-meta iac-meta--with-date">
+                    <div class="iac-meta-left">
+                        <label class="iac-meta-label">姓名：<input class="iac-inline-input" type="text" name="user_name" autocomplete="name" aria-label="姓名"></label>
+                        <label class="iac-meta-label">职位：<input class="iac-inline-input" type="text" name="user_title" autocomplete="organization-title" aria-label="职位"></label>
+                    </div>
+                    <div class="iac-meta-right">
+                        <input class="iac-date-input" type="text" name="form_date" placeholder="2026/mm/dd" inputmode="numeric" aria-label="日期">
+                    </div>
+                </div>
+
+                <div class="iac-table-wrap">
+                    <table class="iac-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">模块</th>
+                                <th scope="col">内容</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="iac-mod">我的霍兰德代码</td>
+                                <td class="iac-val"><textarea class="iac-cell-textarea" rows="2" aria-label="我的霍兰德代码"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td class="iac-mod">我选择的测评建议</td>
+                                <td class="iac-val"><textarea class="iac-cell-textarea" rows="2" aria-label="我选择的测评建议"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td class="iac-mod">我的30天具体行动</td>
+                                <td class="iac-val"><textarea class="iac-cell-textarea" rows="2" aria-label="我的30天具体行动"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td class="iac-mod">我要影响的对象</td>
+                                <td class="iac-val"><textarea class="iac-cell-textarea" rows="2" aria-label="我要影响的对象"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td class="iac-mod">我希望产生的影响</td>
+                                <td class="iac-val"><textarea class="iac-cell-textarea" rows="2" aria-label="我希望产生的影响"></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="iac-actions">
+                        <button type="button" class="iac-btn iac-btn--primary" id="iac-btn-confirm">确认</button>
+                        <button type="button" class="iac-btn iac-btn--secondary" id="iac-btn-pdf" hidden>下载 PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 与页面同仓的本地库，GitHub Pages 同源部署即可一键下载，不依赖外网 CDN -->
+    <script src="vendor/html2pdf.bundle.min.js"></script>
+    <script>
+        (function () {
+            var root = document.getElementById("pdf-capture-root");
+            var confirmBtn = document.getElementById("iac-btn-confirm");
+            var pdfBtn = document.getElementById("iac-btn-pdf");
+
+            confirmBtn.addEventListener("click", function () {
+                pdfBtn.hidden = false;
+                root.classList.add("iac-form-confirmed");
+            });
+
+            function openPrintAsPdf() {
+                window.setTimeout(function () {
+                    window.print();
+                }, 50);
+            }
+
+            function finishPdfButton() {
+                pdfBtn.disabled = false;
+                pdfBtn.textContent = "下载 PDF";
+            }
+
+            function runHtml2PdfDownload() {
+                var opt = {
+                    margin: [8, 8, 8, 8],
+                    filename: "百年生涯-影响力行动卡.pdf",
+                    image: { type: "jpeg", quality: 0.95 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        logging: false,
+                        scrollX: 0,
+                        scrollY: -window.scrollY,
+                        windowWidth: document.documentElement.offsetWidth,
+                        onclone: function (clonedDoc) {
+                            var box = clonedDoc.getElementById("pdf-capture-root");
+                            if (!box) return;
+                            box.style.overflow = "visible";
+                            box.style.height = "auto";
+                            box.style.maxHeight = "none";
+                        }
+                    },
+                    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
+                };
+
+                pdfBtn.disabled = true;
+                pdfBtn.textContent = "正在生成…";
+
+                try {
+                    var chain = html2pdf().set(opt).from(root).save();
+                    if (chain && typeof chain.then === "function") {
+                        chain
+                            .then(function () {
+                                finishPdfButton();
+                            })
+                            .catch(function (err) {
+                                console.error(err);
+                                finishPdfButton();
+                                window.alert("导出 PDF 失败，将改用打印保存（请选择「存储为 PDF」）。");
+                                openPrintAsPdf();
+                            });
+                    } else {
+                        finishPdfButton();
+                    }
+                } catch (e) {
+                    console.error(e);
+                    finishPdfButton();
+                    window.alert("导出 PDF 出错，将改用打印保存（请选择「存储为 PDF」）。");
+                    openPrintAsPdf();
+                }
+            }
+
+            pdfBtn.addEventListener("click", function () {
+                /* file:// 下画布受安全限制，无法可靠生成文件；GitHub Pages 为 https 同源则正常下载 */
+                if (location.protocol === "file:") {
+                    window.alert("当前为本地直接打开文件（file://），浏览器无法可靠生成 PDF 文件。\n\n将打开打印窗口，请选择「存储为 PDF」保存。\n\n若需一键下载，请把本站部署到 GitHub Pages 后用 https 链接打开。");
+                    openPrintAsPdf();
+                    return;
+                }
+                if (typeof html2pdf === "undefined") {
+                    window.alert("未找到 PDF 库（请确认已提交 vendor/html2pdf.bundle.min.js）。将改用打印保存。");
+                    openPrintAsPdf();
+                    return;
+                }
+                runHtml2PdfDownload();
+            });
+        })();
+    </script>
+</body>
+</html>
