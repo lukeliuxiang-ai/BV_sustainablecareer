@@ -215,6 +215,61 @@
             color: var(--text-gray); line-height: 1.6;
         }
         .action-30 strong { color: var(--bv-blue); }
+        /* 报告底部：学以致用 → 影响力行动卡（map01） */
+        .plan-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px 22px;
+            flex-wrap: wrap;
+            margin: 32px auto 12px;
+            max-width: 720px;
+            padding: 22px 28px;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--bv-blue), var(--secondary));
+            box-shadow: 0 10px 36px rgba(0, 85, 164, 0.38);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid rgba(255, 255, 255, 0.22);
+        }
+        .plan-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 44px rgba(0, 85, 164, 0.48);
+            color: #fff;
+        }
+        .plan-cta:focus-visible {
+            outline: 3px solid var(--accent-light);
+            outline-offset: 3px;
+        }
+        .plan-cta__icon {
+            font-size: 2.6rem;
+            line-height: 1;
+        }
+        .plan-cta__text {
+            text-align: center;
+            flex: 1 1 240px;
+            min-width: 0;
+        }
+        .plan-cta__title {
+            display: block;
+            font-size: 1.18rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+        .plan-cta__sub {
+            display: block;
+            font-size: 0.96rem;
+            opacity: 0.96;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .plan-cta__arrow {
+            font-size: 1.85rem;
+            font-weight: 800;
+            opacity: 0.92;
+        }
     </style>
 </head>
 <body>
@@ -887,6 +942,15 @@
                     </div>
                     <a href="mailto:shirley.sun@leader-consulting.com?subject=预约必维职业发展规划深度咨询" class="cta-btn">预约1v1深度咨询</a>
                 </div>
+
+                <a href="map01.html" class="plan-cta" aria-label="打开30天提升影响力计划（影响力行动卡）">
+                    <span class="plan-cta__icon" aria-hidden="true">✨</span>
+                    <span class="plan-cta__text">
+                        <strong class="plan-cta__title">学以致用：把测评洞察带进下一段行动</strong>
+                        <span class="plan-cta__sub">点击此处开启<strong>30天内提升影响力计划</strong>，打开「影响力行动卡」并填写您的承诺与行动。</span>
+                    </span>
+                    <span class="plan-cta__arrow" aria-hidden="true">→</span>
+                </a>
 
                 <div class="btn-group" style="text-align:center; margin-top:30px">
                     <button class="btn-outline" onclick="clearAndRestart()">重新测评</button>
