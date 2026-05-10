@@ -69,119 +69,33 @@
                     </table>
                     <div class="iac-actions">
                         <button type="button" class="iac-btn iac-btn--primary" id="iac-btn-confirm">确认</button>
-                        <button type="button" class="iac-btn iac-btn--secondary" id="iac-btn-pdf" hidden>下载 PDF</button>
+                        <button type="button" class="iac-btn iac-btn--secondary" id="iac-btn-pdf" hidden>另存为 PDF</button>
+                        <p id="iac-print-hint" class="iac-print-hint" hidden>与测评报告相同：将打开打印预览，在打印机中选择「<strong>存储为 PDF</strong>」或「<strong>Microsoft Print to PDF</strong>」后保存即可。</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 与页面同仓的本地库，GitHub Pages 同源部署即可一键下载，不依赖外网 CDN -->
-    <script src="vendor/html2pdf.bundle.min.js"></script>
     <script>
         (function () {
             var root = document.getElementById("pdf-capture-root");
             var confirmBtn = document.getElementById("iac-btn-confirm");
             var pdfBtn = document.getElementById("iac-btn-pdf");
+            var hint = document.getElementById("iac-print-hint");
 
             confirmBtn.addEventListener("click", function () {
                 pdfBtn.hidden = false;
+                if (hint) hint.hidden = false;
                 root.classList.add("iac-form-confirmed");
             });
 
-            function openPrintAsPdf() {
+            pdfBtn.addEventListener("click", function () {
+                window.scrollTo(0, 0);
+                /* 与 index 测评报告「保存报告」一致：由浏览器打印排版，用户选「存储为 PDF」 */
                 window.setTimeout(function () {
                     window.print();
-                }, 50);
-            }
-
-            function finishPdfButton() {
-                pdfBtn.disabled = false;
-                pdfBtn.textContent = "下载 PDF";
-            }
-
-            function runHtml2PdfDownload() {
-                /* 自定义页面宽高（mm）与幻灯片 16:9 一致，单页横版，避免 A4 比例不符导致裁切与分页 */
-                var MM_PER_PX = 25.4 / 96;
-                var wPx = Math.max(1, Math.round(root.offsetWidth));
-                var hPx = Math.max(1, Math.round(root.offsetHeight));
-                var wMm = Math.ceil(wPx * MM_PER_PX * 100) / 100 + 0.25;
-                var hMm = Math.ceil(hPx * MM_PER_PX * 100) / 100 + 0.25;
-
-                var opt = {
-                    margin: [0, 0, 0, 0],
-                    filename: "百年生涯-影响力行动卡.pdf",
-                    image: { type: "jpeg", quality: 0.93 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: false,
-                        letterRendering: true,
-                        logging: false,
-                        scrollX: 0,
-                        scrollY: 0,
-                        x: 0,
-                        y: 0,
-                        width: wPx,
-                        height: hPx,
-                        windowWidth: wPx,
-                        windowHeight: hPx,
-                        backgroundColor: "#ffffff",
-                        onclone: function (clonedDoc) {
-                            var box = clonedDoc.getElementById("pdf-capture-root");
-                            if (!box) return;
-                            box.style.overflow = "visible";
-                            box.style.height = "auto";
-                            box.style.maxHeight = "none";
-                            box.style.boxShadow = "none";
-                            var actions = box.querySelector(".iac-actions");
-                            if (actions) actions.style.display = "none";
-                        }
-                    },
-                    /* 仅传 [宽mm, 高mm]，勿再加 orientation，否则部分 jsPDF 版本会二次旋转导致竖版裁切 */
-                    jsPDF: { unit: "mm", format: [wMm, hMm], compress: true }
-                };
-
-                pdfBtn.disabled = true;
-                pdfBtn.textContent = "正在生成…";
-
-                try {
-                    var chain = html2pdf().set(opt).from(root).save();
-                    if (chain && typeof chain.then === "function") {
-                        chain
-                            .then(function () {
-                                finishPdfButton();
-                            })
-                            .catch(function (err) {
-                                console.error(err);
-                                finishPdfButton();
-                                window.alert("导出 PDF 失败，将改用打印保存（请选择「存储为 PDF」）。");
-                                openPrintAsPdf();
-                            });
-                    } else {
-                        finishPdfButton();
-                    }
-                } catch (e) {
-                    console.error(e);
-                    finishPdfButton();
-                    window.alert("导出 PDF 出错，将改用打印保存（请选择「存储为 PDF」）。");
-                    openPrintAsPdf();
-                }
-            }
-
-            pdfBtn.addEventListener("click", function () {
-                /* file:// 下画布受安全限制，无法可靠生成文件；GitHub Pages 为 https 同源则正常下载 */
-                if (location.protocol === "file:") {
-                    window.alert("当前为本地直接打开文件（file://），浏览器无法可靠生成 PDF 文件。\n\n将打开打印窗口，请选择「存储为 PDF」保存。\n\n若需一键下载，请把本站部署到 GitHub Pages 后用 https 链接打开。");
-                    openPrintAsPdf();
-                    return;
-                }
-                if (typeof html2pdf === "undefined") {
-                    window.alert("未找到 PDF 库（请确认已提交 vendor/html2pdf.bundle.min.js）。将改用打印保存。");
-                    openPrintAsPdf();
-                    return;
-                }
-                runHtml2PdfDownload();
+                }, 100);
             });
         })();
     </script>

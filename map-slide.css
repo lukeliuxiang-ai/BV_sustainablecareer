@@ -279,6 +279,23 @@ body {
     border-top-color: rgba(76, 140, 90, 0.25);
 }
 
+.iac-print-hint {
+    flex-basis: 100%;
+    order: 10;
+    margin: 10px 0 0;
+    padding: 0 2px 0 0;
+    font-size: clamp(0.8rem, 1.9vw, 0.92rem);
+    color: #6b5d5f;
+    line-height: 1.55;
+    text-align: left;
+    max-width: 42em;
+}
+
+.iac-print-hint strong {
+    color: #4a2528;
+    font-weight: 700;
+}
+
 .iac-table {
     width: 100%;
     border-collapse: collapse;
@@ -339,6 +356,11 @@ body > .deck-stack.map-deck {
 }
 
 /* map01 空白版：与 map02 共用基础样式，此处整体约 +20% 便于投屏阅读（map02 不变） */
+/* 左上角只保留 colorpatch.png；去掉 deck-branding 中作为占位用的深红渐变底（否则会像多了一块方色） */
+body.iac-blank-page .slide-container .red-corner {
+    background: none;
+}
+
 body.iac-blank-page .iac-header h1 {
     font-size: clamp(2.1rem, 5.76vw, 3.42rem);
 }
@@ -393,31 +415,197 @@ body.iac-blank-page .iac-career-title {
     }
 }
 
-/* 本地/在线：通过「打印 → 存储为 PDF」导出时隐藏操作按钮、铺满页面 */
+/* 另存为 PDF：与 index 测评报告相同，走浏览器打印；以下为纸张排版（避免截图式 PDF 错位、裁切） */
+@page {
+    size: A4 portrait;
+    margin: 10mm;
+}
+
 @media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    html,
+    body {
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
     body.iac-blank-page {
         background: #fff !important;
     }
 
     body.iac-blank-page .deck-stack.map-deck {
         display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
         min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        align-items: stretch !important;
+        justify-content: flex-start !important;
     }
 
+    body.iac-blank-page #pdf-capture-root.slide-container,
     body.iac-blank-page .slide-container {
+        position: relative !important;
+        left: 0 !important;
+        right: auto !important;
         width: 100% !important;
+        max-width: 100% !important;
         height: auto !important;
-        max-width: none !important;
+        min-height: 0 !important;
         max-height: none !important;
+        margin: 0 !important;
+        padding: 4mm 2mm 6mm !important;
         aspect-ratio: auto !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         overflow: visible !important;
-        page-break-inside: avoid;
+        transform: none !important;
+        page-break-inside: auto;
+    }
+
+    body.iac-blank-page .slide-container .red-corner {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 52px !important;
+        height: 52px !important;
+        z-index: 1 !important;
+        background: none !important;
+    }
+
+    body.iac-blank-page .slide-container .logo {
+        position: absolute !important;
+        top: 4px !important;
+        right: 8px !important;
+        z-index: 1 !important;
+    }
+
+    body.iac-blank-page .slide-container .logo img {
+        height: 44px !important;
+        width: auto !important;
     }
 
     body.iac-blank-page .iac-wrap {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 48px 0 0 !important;
         overflow: visible !important;
+        flex: none !important;
+        min-height: 0 !important;
+        display: block !important;
+    }
+
+    body.iac-blank-page .iac-career-title {
+        font-size: 12pt !important;
+        text-align: center !important;
+        page-break-after: avoid;
+        letter-spacing: 0.08em !important;
+    }
+
+    body.iac-blank-page .iac-header {
+        border-radius: 8px 8px 0 0 !important;
+        page-break-inside: avoid;
+        padding: 14px 16px 12px !important;
+    }
+
+    body.iac-blank-page .iac-header h1 {
+        font-size: 20pt !important;
+        margin-bottom: 6px !important;
+    }
+
+    body.iac-blank-page .iac-header .iac-sub {
+        font-size: 11pt !important;
+    }
+
+    body.iac-blank-page .iac-meta {
+        font-size: 10.5pt !important;
+        page-break-inside: avoid;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px 14px !important;
+        padding: 10px 12px !important;
+    }
+
+    body.iac-blank-page .iac-meta-left {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    body.iac-blank-page .iac-meta-right {
+        flex-shrink: 0 !important;
+    }
+
+    body.iac-blank-page .iac-inline-input {
+        min-width: 10em !important;
+        max-width: 100% !important;
+        border-bottom: 1px solid #333 !important;
+    }
+
+    body.iac-blank-page .iac-date-input {
+        font-size: 10pt !important;
+        color: #444 !important;
+        width: 9.5em !important;
+    }
+
+    body.iac-blank-page .iac-table-wrap {
+        overflow: visible !important;
+        flex: none !important;
+        border-radius: 0 0 8px 8px !important;
+    }
+
+    body.iac-blank-page .iac-table {
+        width: 100% !important;
+        font-size: 10pt !important;
+        line-height: 1.45 !important;
+    }
+
+    body.iac-blank-page .iac-table thead {
+        display: table-header-group !important;
+    }
+
+    body.iac-blank-page .iac-table tbody tr {
+        page-break-inside: avoid !important;
+    }
+
+    body.iac-blank-page .iac-table thead th {
+        padding: 8px 10px !important;
+        font-size: 9.5pt !important;
+    }
+
+    body.iac-blank-page .iac-table thead th:first-child {
+        width: 30% !important;
+        min-width: 0 !important;
+    }
+
+    body.iac-blank-page .iac-table tbody td {
+        padding: 8px 10px !important;
+    }
+
+    body.iac-blank-page .iac-cell-textarea {
+        display: block !important;
+        width: 100% !important;
+        min-height: 4.2em !important;
+        font-size: 10pt !important;
+        line-height: 1.45 !important;
+        border: 1px solid #bbb !important;
+        border-radius: 4px !important;
+        padding: 6px 8px !important;
+        resize: none !important;
+        background: #fff !important;
+        color: #111 !important;
+        box-sizing: border-box !important;
     }
 
     body.iac-blank-page .iac-actions {
