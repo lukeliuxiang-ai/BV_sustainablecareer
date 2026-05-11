@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>必维职业发展规划测评 05 | Bureau Veritas Career Development</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>必维职业发展规划测评 05（index01）| Bureau Veritas Career Development</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -143,6 +143,7 @@
         .score-bar-bg { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .score-bar-fill { height: 100%; background: linear-gradient(90deg, var(--bv-blue), var(--accent)); width: 0%; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; } }
         .report-section {
             background: var(--white); border-radius: 24px; padding: 30px;
             margin-bottom: 20px; box-shadow: var(--shadow);
@@ -252,136 +253,6 @@
             font-size: 1.85rem;
             font-weight: 800;
             opacity: 0.92;
-        }
-
-        .top-ipo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .cta-section {
-            text-align: center;
-            margin-top: 8px;
-        }
-        .cta-section h3 {
-            color: var(--primary);
-            font-size: 1.15rem;
-            margin-bottom: 12px;
-        }
-        .cta-section p {
-            color: var(--text-gray);
-            line-height: 1.75;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-        .cta-btn {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 14px 28px;
-            background: linear-gradient(135deg, var(--bv-blue), var(--secondary));
-            color: #fff !important;
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0, 85, 164, 0.25);
-            touch-action: manipulation;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding-left: env(safe-area-inset-left, 0);
-                padding-right: env(safe-area-inset-right, 0);
-            }
-            .container {
-                padding: max(20px, env(safe-area-inset-top, 0)) 14px max(28px, env(safe-area-inset-bottom, 0));
-                justify-content: flex-start;
-                min-height: 100dvh;
-                min-height: 100vh;
-            }
-            h1 { font-size: 1.55rem; }
-            .subtitle { font-size: 0.95rem; margin-bottom: 18px; }
-            .logo { width: 80px; height: 80px; font-size: 28px; margin-bottom: 18px; }
-            .intro-card,
-            .context-banner { padding: 18px 14px; }
-            .context-banner { margin-bottom: 20px; }
-            .intro-card h2 { font-size: 1.1rem; flex-wrap: wrap; }
-            .radio-group { flex-direction: column; }
-            .radio-card { min-width: 0; width: 100%; }
-            .question-card { padding: 22px 14px; }
-            .question-text { font-size: 1.08rem; margin-bottom: 18px; }
-            .options-container { max-width: 100%; }
-            .option-btn {
-                min-height: 48px;
-                align-items: center;
-                touch-action: manipulation;
-            }
-            .option-btn:hover { transform: none; }
-            .progress-container { padding: 14px; margin-bottom: 14px; }
-            .result-grid { grid-template-columns: 1fr; gap: 18px; }
-            .chart-container,
-            .scores-container { padding: 14px; border-radius: 16px; }
-            .chart-container { min-height: 220px; position: relative; }
-            .report-section { padding: 16px 12px; border-radius: 18px; }
-            .result-code { font-size: 2rem; letter-spacing: 3px; }
-            .top-ipo-grid { grid-template-columns: 1fr; gap: 12px; }
-            .plan-cta {
-                margin: 22px 0 10px;
-                padding: 16px 14px;
-                gap: 12px;
-                max-width: none;
-                flex-direction: column;
-                text-align: center;
-                touch-action: manipulation;
-            }
-            .plan-cta__text { flex: 1 1 auto; }
-            .plan-cta__icon { font-size: 2rem; }
-            .plan-cta__title { font-size: 1rem; }
-            .plan-cta__sub { font-size: 0.86rem; }
-            .btn-primary {
-                width: 100%;
-                max-width: 400px;
-                padding: 14px 24px;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-                box-sizing: border-box;
-                touch-action: manipulation;
-            }
-            .btn-outline {
-                width: 100%;
-                max-width: 400px;
-                margin-top: 0;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-                box-sizing: border-box;
-                touch-action: manipulation;
-            }
-            .btn-group {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-                margin-top: 20px !important;
-            }
-            .cta-btn {
-                width: 100%;
-                max-width: 400px;
-                box-sizing: border-box;
-                text-align: center;
-            }
-            .artistic-note {
-                margin-left: 0;
-                margin-right: 0;
-                padding: 14px;
-                font-size: 0.88rem;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .container { padding-left: 12px; padding-right: 12px; }
-            h1 { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -871,7 +742,6 @@
     // ==================== 渲染结果页 ====================
         // ==================== 渲染结果页（精简版 05 · 岗位四类）====================
     function renderResult(data) {
-        document.body.classList.add('bv-report-view');
         const { userPosition, userRoleType, userCareerGoal, scores, topCode, secondCode, thirdCode } = data;
         const sortedScores = getSortedScoreLines(scores);
         const p0Key = topCode + secondCode;
@@ -1003,7 +873,7 @@
                 <!-- TOP模型衔接 -->
                 <div class="report-section">
                     <h3>🔺 TOP模型：您的职业巅峰状态</h3>
-                    <div class="top-ipo-grid">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;margin:15px 0">
                         <div style="background:linear-gradient(135deg,#e6f0f8,#fff);border-radius:16px;padding:20px;text-align:center">
                             <div style="font-size:2rem;margin-bottom:10px">🚀</div>
                             <h4 style="color:var(--bv-blue);margin-bottom:8px">T - Talent</h4>
@@ -1091,7 +961,6 @@
 
     // ==================== 渲染首页 ====================
     function renderIntro() {
-        document.body.classList.remove('bv-report-view');
         const app = document.getElementById('app');
         app.innerHTML = `
             <div class="intro-section">
@@ -1134,7 +1003,7 @@
                     <div class="input-group">
                         <label for="jobCategorySelect">请选择您当前的岗位</label>
                         <select id="jobCategorySelect" required aria-label="岗位">
-                            <option value="" disabled selected hidden></option>
+                            <option value="">请选择岗位</option>
                             ${JOB_CATEGORIES.map(j => `<option value="${j}">${j}</option>`).join('')}
                         </select>
                     </div>
@@ -1226,7 +1095,6 @@
     }
 
     function renderQuizQuestion() {
-        document.body.classList.remove('bv-report-view');
         const app = document.getElementById('app');
         if (currentIndex >= currentQuestions.length) {
             const scores = quizScores;
