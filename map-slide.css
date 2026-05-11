@@ -339,11 +339,6 @@ body > .deck-stack.map-deck {
 }
 
 /* map01 空白版：与 map02 共用基础样式，此处整体约 +20% 便于投屏阅读（map02 不变） */
-/* 左上角只保留 colorpatch.png；去掉 deck-branding 中作为占位用的深红渐变底（否则会像多了一块方色） */
-body.iac-blank-page .slide-container .red-corner {
-    background: none;
-}
-
 body.iac-blank-page .iac-header h1 {
     font-size: clamp(2.1rem, 5.76vw, 3.42rem);
 }
@@ -461,34 +456,12 @@ body.iac-blank-page .iac-career-title {
         zoom: 0.9;
     }
 
-    body.iac-blank-page .slide-container .red-corner {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 44px !important;
-        height: 44px !important;
-        z-index: 1 !important;
-        background: none !important;
-    }
-
-    body.iac-blank-page .slide-container .logo {
-        position: absolute !important;
-        top: 2px !important;
-        right: 6px !important;
-        z-index: 1 !important;
-    }
-
-    body.iac-blank-page .slide-container .logo img {
-        height: 36px !important;
-        width: auto !important;
-    }
-
     body.iac-blank-page .iac-wrap {
         position: relative !important;
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 !important;
-        padding: 38px 0 0 !important;
+        padding: 6px 0 0 !important;
         overflow: visible !important;
         flex: none !important;
         min-height: 0 !important;

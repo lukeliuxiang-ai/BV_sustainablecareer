@@ -4,20 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>百年生涯 · 影响力行动卡 | map01</title>
-    <link rel="stylesheet" href="deck-branding.css">
     <link rel="stylesheet" href="map-slide.css">
 </head>
 <body class="iac-blank-page">
     <div class="deck-stack map-deck">
         <div class="slide-container" id="pdf-capture-root">
-            <div class="red-corner">
-                <img src="images/colorpatch.png" alt="装饰">
-            </div>
-
-            <div class="logo">
-                <img src="images/lh_logo.png" alt="礼淮咨询 Logo">
-            </div>
-
             <div class="iac-wrap">
                 <p class="iac-career-title" lang="zh-CN">百年生涯 <span class="iac-career-title__en" lang="en">Sustainable Career</span></p>
 
@@ -32,7 +23,7 @@
                         <label class="iac-meta-label">职位：<input class="iac-inline-input" type="text" name="user_title" autocomplete="organization-title" aria-label="职位"></label>
                     </div>
                     <div class="iac-meta-right">
-                        <input class="iac-date-input" type="text" name="form_date" placeholder="2026/mm/dd" inputmode="numeric" aria-label="日期">
+                        <input class="iac-date-input" type="text" name="form_date" inputmode="numeric" aria-label="日期">
                     </div>
                 </div>
 
@@ -89,7 +80,6 @@
 
             pdfBtn.addEventListener("click", function () {
                 window.scrollTo(0, 0);
-                /* 与 index 测评报告「保存报告」一致：由浏览器打印排版，用户选「存储为 PDF」 */
                 window.setTimeout(function () {
                     window.print();
                 }, 100);
