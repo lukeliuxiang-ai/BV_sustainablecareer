@@ -137,6 +137,17 @@
         .result-code { font-size: 3rem; font-weight: 800; letter-spacing: 5px; margin: 20px 0; }
         .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
         .chart-container, .scores-container { background: var(--white); border-radius: 20px; padding: 20px; }
+        /* 避免 Chart.js canvas 实际像素区大于盒子时在移动端叠住下方链接（如「学以致用」） */
+        .chart-container {
+            overflow: hidden;
+            position: relative;
+        }
+        #radarChart {
+            display: block;
+            max-width: 100%;
+            height: auto !important;
+            pointer-events: none;
+        }
         .chart-title { font-weight: 700; color: var(--primary); margin-bottom: 14px; font-size: 1rem; }
         .score-item { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         .score-letter { width: 40px; height: 40px; background: var(--bv-blue); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
@@ -215,6 +226,10 @@
             box-shadow: 0 10px 36px rgba(0, 85, 164, 0.38);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: 2px solid rgba(255, 255, 255, 0.22);
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
         }
         .plan-cta:hover {
             transform: translateY(-3px);
@@ -382,6 +397,115 @@
         @media (max-width: 420px) {
             .container { padding-left: 12px; padding-right: 12px; }
             h1 { font-size: 1.4rem; }
+        }
+
+        /* 屏幕端：说明如何用手机存 PDF（不进入打印页） */
+        .print-help-banner {
+            margin: 16px 0 8px;
+            padding: 12px 14px;
+            background: #f0f6fc;
+            border: 1px solid #c5d7eb;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            line-height: 1.65;
+            color: var(--text-gray);
+            text-align: left;
+        }
+        .print-help-banner summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .print-help-banner__body { margin-top: 10px; }
+        .print-help-banner__body p { margin-bottom: 8px; }
+        .print-help-banner__body p:last-child { margin-bottom: 0; }
+
+        /* 打印用快照：平时不占位显示，避免与雷达 canvas 叠影 */
+        .chart-print-snapshot {
+            display: none;
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            html,
+            body {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background: #fff !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: 0 !important;
+                display: block !important;
+                justify-content: flex-start !important;
+            }
+
+            .result-section {
+                display: block !important;
+                box-shadow: none !important;
+            }
+
+            .print-help-banner,
+            .btn-group,
+            .plan-cta {
+                display: none !important;
+            }
+
+            .report-section,
+            .chart-container,
+            .scores-container,
+            .cta-section,
+            .artistic-note,
+            .rare-note {
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+
+            .result-grid {
+                gap: 12px !important;
+            }
+
+            .chart-container {
+                min-height: 0 !important;
+                position: relative !important;
+            }
+
+            /* 打印前注入的雷达图快照；隐藏原 canvas 避免手机端空白 */
+            canvas#radarChart.chart-canvas--print-hidden {
+                display: none !important;
+            }
+
+            .chart-print-snapshot {
+                display: block !important;
+                max-width: 100% !important;
+                height: auto !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid;
+            }
+
+            .cta-btn {
+                border: 1px solid #ccc !important;
+                color: #1a202c !important;
+                background: #fff !important;
+                box-shadow: none !important;
+            }
         }
     </style>
 </head>
@@ -871,6 +995,10 @@
     // ==================== 渲染结果页 ====================
         // ==================== 渲染结果页（精简版 05 · 岗位四类）====================
     function renderResult(data) {
+        if (window.__bvReportChart) {
+            try { window.__bvReportChart.destroy(); } catch (e) {}
+            window.__bvReportChart = null;
+        }
         document.body.classList.add('bv-report-view');
         const { userPosition, userRoleType, userCareerGoal, scores, topCode, secondCode, thirdCode } = data;
         const sortedScores = getSortedScoreLines(scores);
@@ -1063,9 +1191,18 @@
                     <span class="plan-cta__arrow" aria-hidden="true">→</span>
                 </a>
 
+                <details class="print-help-banner">
+                    <summary>手机如何保存为 PDF？</summary>
+                    <div class="print-help-banner__body">
+                        <p><strong>iPhone / iPad（Safari）：</strong>点下方「保存报告」→ 在打印预览里可双指缩放查看 → 点右上角 <strong>分享</strong> → 选 <strong>「存储到“文件”」</strong> 即可得到 PDF。</p>
+                        <p><strong>Android（Chrome 等）：</strong>点「保存报告」→ 打印机/目标选 <strong>「另存为 PDF」</strong> 或 <strong>「保存为 PDF」</strong> → 保存。</p>
+                        <p>若预览里图表空白：请先<strong>回到本页等雷达图显示完整</strong>，再点一次保存。</p>
+                    </div>
+                </details>
+
                 <div class="btn-group" style="text-align:center; margin-top:30px">
-                    <button class="btn-outline" onclick="clearAndRestart()">重新测评</button>
-                    <button class="btn-primary" onclick="window.print()">保存报告</button>
+                    <button type="button" class="btn-outline" onclick="clearAndRestart()">重新测评</button>
+                    <button type="button" class="btn-primary" onclick="printBvReport()">保存报告</button>
                 </div>
             </div>
         `;
@@ -1073,7 +1210,7 @@
         const rOrder = ['R','I','A','S','E','C'];
         const radarVals = rOrder.map(c => Math.round((scores[c] / 50) * 100));
         const ctx = document.getElementById('radarChart').getContext('2d');
-        new Chart(ctx, {
+        window.__bvReportChart = new Chart(ctx, {
             type: 'radar',
             data: {
                 labels: ['R实际','I研究','A艺术','S社会','E企业','C常规'],
@@ -1085,12 +1222,22 @@
                     borderWidth: 2
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: true, scales: { r: { beginAtZero: true, max: 100 } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: false,
+                events: [],
+                scales: { r: { beginAtZero: true, max: 100 } }
+            }
         });
     }
 
     // ==================== 渲染首页 ====================
     function renderIntro() {
+        if (window.__bvReportChart) {
+            try { window.__bvReportChart.destroy(); } catch (e) {}
+            window.__bvReportChart = null;
+        }
         document.body.classList.remove('bv-report-view');
         const app = document.getElementById('app');
         app.innerHTML = `
@@ -1289,6 +1436,54 @@
     }
 
     window.clearAndRestart = clearAndRestart;
+
+    function prepareChartPrintSnapshot() {
+        var chart = window.__bvReportChart;
+        var canvas = document.getElementById('radarChart');
+        document.querySelectorAll('.chart-print-snapshot').forEach(function (el) { el.remove(); });
+        if (canvas) canvas.classList.remove('chart-canvas--print-hidden');
+        if (!chart || !canvas) return;
+        var wrap = canvas.closest('.chart-container');
+        if (!wrap) return;
+        try {
+            chart.resize();
+            chart.update('none');
+            var img = document.createElement('img');
+            img.className = 'chart-print-snapshot';
+            img.src = chart.toBase64Image('image/png', 1);
+            img.alt = '兴趣分布雷达图';
+            img.style.cssText = 'display:block;max-width:100%;height:auto;margin:8px auto 0';
+            wrap.appendChild(img);
+            canvas.classList.add('chart-canvas--print-hidden');
+        } catch (err) {}
+    }
+
+    function cleanupChartPrintSnapshot() {
+        document.querySelectorAll('.chart-print-snapshot').forEach(function (el) { el.remove(); });
+        var canvas = document.getElementById('radarChart');
+        if (canvas) canvas.classList.remove('chart-canvas--print-hidden');
+        var ch = window.__bvReportChart;
+        if (ch) try { ch.resize(); } catch (e2) {}
+    }
+
+    (function setupBvReportPrint() {
+        if (window.__bvReportPrintBound) return;
+        window.__bvReportPrintBound = true;
+        window.addEventListener('beforeprint', prepareChartPrintSnapshot);
+        window.addEventListener('afterprint', cleanupChartPrintSnapshot);
+    })();
+
+    window.printBvReport = function () {
+        window.scrollTo(0, 0);
+        prepareChartPrintSnapshot();
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                window.print();
+                setTimeout(cleanupChartPrintSnapshot, 8000);
+            });
+        });
+    };
+
     initApp();
 </script>
 </body>

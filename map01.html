@@ -23,7 +23,10 @@
                         <label class="iac-meta-label">职位：<input class="iac-inline-input" type="text" name="user_title" autocomplete="organization-title" aria-label="职位"></label>
                     </div>
                     <div class="iac-meta-right">
-                        <input class="iac-date-input" type="text" name="form_date" inputmode="numeric" aria-label="日期">
+                        <label class="iac-meta-label iac-meta-label--date">
+                            日期：
+                            <input class="iac-date-input" type="text" name="form_date" inputmode="numeric" autocomplete="off" placeholder="年/月/日" aria-label="日期，格式：年/月/日">
+                        </label>
                     </div>
                 </div>
 
@@ -58,6 +61,14 @@
                             </tr>
                         </tbody>
                     </table>
+                    <details class="iac-print-help">
+                        <summary>手机如何另存为 PDF？</summary>
+                        <div class="iac-print-help__body">
+                            <p><strong>iPhone / iPad：</strong>先点「确认」出现「另存为 PDF」→ 点后在预览中点右上角 <strong>分享</strong> → <strong>「存储到“文件”」</strong>。</p>
+                            <p><strong>Android：</strong>在打印界面把打印机改为 <strong>「另存为 PDF」</strong> 后保存。</p>
+                            <p>若预览空白：可先<strong>滚动到页面顶部</strong>再试；仍异常可用系统截图暂存。</p>
+                        </div>
+                    </details>
                     <div class="iac-actions">
                         <button type="button" class="iac-btn iac-btn--primary" id="iac-btn-confirm">确认</button>
                         <button type="button" class="iac-btn iac-btn--secondary" id="iac-btn-pdf" hidden>另存为 PDF</button>
@@ -78,12 +89,19 @@
                 root.classList.add("iac-form-confirmed");
             });
 
-            pdfBtn.addEventListener("click", function () {
+            function printIacCard() {
+                if (document.activeElement && document.activeElement.blur) {
+                    document.activeElement.blur();
+                }
                 window.scrollTo(0, 0);
-                window.setTimeout(function () {
-                    window.print();
-                }, 100);
-            });
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        window.print();
+                    });
+                });
+            }
+
+            pdfBtn.addEventListener("click", printIacCard);
         })();
     </script>
 </body>
