@@ -97,6 +97,16 @@
             font-family: inherit; background: var(--white); cursor: pointer;
         }
         .input-group select:focus { outline: none; border-color: var(--bv-blue); box-shadow: 0 0 0 3px rgba(0, 85, 164, 0.1); }
+        /* 岗位未选择时：下拉框内灰色提示（选中具体岗位后恢复正文色） */
+        #jobCategorySelect.bv-job-select--placeholder {
+            color: #94a3b8;
+        }
+        #jobCategorySelect.bv-job-select--placeholder option {
+            color: var(--text-dark);
+        }
+        #jobCategorySelect.bv-job-select--placeholder option[value=""] {
+            color: #94a3b8;
+        }
         .radio-group { display: flex; gap: 15px; flex-wrap: wrap; }
         .radio-card {
             flex: 1; min-width: 200px; padding: 20px; background: var(--bg-light);
@@ -1344,15 +1354,15 @@
                     </div>
 
                     <div class="input-group">
-                        <label for="jobCategorySelect">请选择您当前的岗位</label>
-                        <select id="jobCategorySelect" required aria-label="岗位">
-                            <option value="" disabled selected hidden></option>
+                        <label for="jobCategorySelect">1. 请选择您当前的岗位</label>
+                        <select id="jobCategorySelect" class="bv-job-select bv-job-select--placeholder" required aria-label="岗位">
+                            <option value="" selected>请点击选择您所属的岗位类别</option>
                             ${JOB_CATEGORIES.map(j => `<option value="${j}">${j}</option>`).join('')}
                         </select>
                     </div>
 
                     <div class="input-group">
-                        <label>请选择您的岗位性质</label>
+                        <label>2. 请选择您的岗位性质</label>
                         <div class="radio-group">
                             <div class="radio-card" data-role="individual">
                                 <span class="radio-title">个人贡献者</span>
@@ -1366,7 +1376,7 @@
                     </div>
 
                     <div class="input-group">
-                        <label>请选择您的职业目标</label>
+                        <label>3. 请选择您的职业目标</label>
                         <div class="radio-group">
                             <div class="radio-card" data-goal="expert">
                                 <span class="radio-title">专家岗</span>
@@ -1407,11 +1417,20 @@
         const jobSelect = document.getElementById('jobCategorySelect');
         const startBtn = document.getElementById('startQuizBtn');
 
+        function syncJobSelectPlaceholderClass() {
+            if (!jobSelect) return;
+            jobSelect.classList.toggle('bv-job-select--placeholder', !jobSelect.value);
+        }
+
         function checkStart() {
             startBtn.disabled = !(jobSelect.value && selectedRole && selectedGoal);
         }
 
-        jobSelect.addEventListener('change', checkStart);
+        jobSelect.addEventListener('change', () => {
+            syncJobSelectPlaceholderClass();
+            checkStart();
+        });
+        syncJobSelectPlaceholderClass();
         startBtn.addEventListener('click', () => {
             if (jobSelect.value && selectedRole && selectedGoal) {
                 startQuiz(jobSelect.value, selectedRole, selectedGoal);
