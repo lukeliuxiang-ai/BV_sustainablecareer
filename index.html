@@ -908,7 +908,19 @@
         if (P0_ADVICE[p0Key]) return { level: 'P0', label: '高频组合', badgeClass: 'badge-p0' };
         if (P1_ADVICE[p0Key]) return { level: 'P1', label: '中频组合', badgeClass: 'badge-p1' };
         if (P2_ADVICE[p0Key]) return { level: 'P2', label: '低频/罕见组合', badgeClass: 'badge-p2' };
-        return { level: 'P0', label: '高频组合', badgeClass: 'badge-p0' };
+        /* 未在 P0/P1/P2 表中的前两位组合：勿标为 P0，否则易与「无 p0Data」逻辑混淆 */
+        return { level: 'PX', label: '综合解读', badgeClass: 'badge-p1' };
+    }
+
+    /** 霍兰德组合文案里「…型」标题取「型」前片段；无型则用整段标题；无数据则回退 */
+    function talentTypeKeyword(p0Data, p1Data, p2Data) {
+        const adv = (p0Data && p0Data.title) ? p0Data : (p1Data && p1Data.title) ? p1Data : (p2Data && p2Data.title) ? p2Data : null;
+        if (!adv || typeof adv.title !== 'string') return '专业';
+        const t = adv.title.trim();
+        if (!t) return '专业';
+        const i = t.indexOf('型');
+        if (i > 0) return t.slice(0, i);
+        return t;
     }
 
     // ==================== 岗位 x 岗位性质 x 目标 交叉建议 ====================
@@ -984,8 +996,42 @@
     function loadQuizData() {
         const completed = localStorage.getItem('bv_quiz_completed');
         const data = localStorage.getItem('bv_quiz_data');
-        if (completed === 'true' && data) return JSON.parse(data);
-        return null;
+        if (completed !== 'true' || !data) return null;
+        try {
+            const raw = JSON.parse(data);
+            return normalizeQuizResult(raw);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /** 兼容旧版/异常 localStorage，避免出现页面上字面量 "undefined" */
+    function normalizeQuizResult(d) {
+        if (!d || typeof d !== 'object') return null;
+        const order = ['R', 'I', 'A', 'S', 'E', 'C'];
+        const scores = d.scores && typeof d.scores === 'object' ? d.scores : {};
+        let topCode = d.topCode;
+        let secondCode = d.secondCode;
+        let thirdCode = d.thirdCode;
+        if (!order.includes(topCode) || !order.includes(secondCode) || !order.includes(thirdCode)) {
+            const sorted = [...order].sort((a, b) => (Number(scores[b]) || 0) - (Number(scores[a]) || 0));
+            topCode = sorted[0] || 'R';
+            secondCode = sorted[1] || 'I';
+            thirdCode = sorted[2] || 'A';
+        }
+        const role = d.userRoleType === 'manager' ? 'manager' : 'individual';
+        const goal = d.userCareerGoal === 'manager' ? 'manager' : 'expert';
+        const pos = typeof d.userPosition === 'string' ? d.userPosition.trim() : '';
+        return {
+            ...d,
+            userPosition: pos,
+            userRoleType: role,
+            userCareerGoal: goal,
+            scores,
+            topCode,
+            secondCode,
+            thirdCode
+        };
     }
     function clearQuizData() {
         localStorage.removeItem('bv_quiz_completed');
@@ -1010,6 +1056,14 @@
         const crossAdvice = getCrossAdvice(userPosition, userRoleType, userCareerGoal, topCode, secondCode);
         const artisticTopTwo = topCode === 'A' || secondCode === 'A';
 
+        const roleLabel = ROLE_TYPES[userRoleType] || '个人贡献者';
+        const goalLabel = CAREER_GOALS[userCareerGoal] || '专家岗';
+        const posLabel = (userPosition && String(userPosition).trim()) || '未选择';
+        const hTop = (hollandCodes[topCode] && hollandCodes[topCode].name) || topCode;
+        const hSecond = (hollandCodes[secondCode] && hollandCodes[secondCode].name) || secondCode;
+        const hThird = (hollandCodes[thirdCode] && hollandCodes[thirdCode].name) || thirdCode;
+        const talentKw = talentTypeKeyword(p0Data, p1Data, p2Data);
+
         let comboSection = '';
         if (priority.level === 'P0' && p0Data) {
             comboSection = `
@@ -1018,7 +1072,7 @@
                     <p><strong>组合类型：</strong>${p0Data.title}</p>
                     <p><strong>核心特质：</strong>${p0Data.desc}</p>
                     <p style="margin-top:12px"><strong>建议行动：</strong></p>
-                    <ul>${p0Data.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                    <ul>${(p0Data.actions || []).map(a => `<li>${a}</li>`).join('')}</ul>
                 </div>`;
         } else if (priority.level === 'P1' && p1Data) {
             comboSection = `
@@ -1027,43 +1081,48 @@
                     <p><strong>组合类型：</strong>${p1Data.title}</p>
                     <p><strong>核心特质：</strong>${p1Data.desc}</p>
                     <p style="margin-top:12px"><strong>建议行动：</strong></p>
-                    <ul>${p1Data.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                    <ul>${(p1Data.actions || []).map(a => `<li>${a}</li>`).join('')}</ul>
                     <div class="rare-note" style="margin-top:15px">
                         <p style="font-size:0.9rem;color:var(--text-gray)">💡 此组合属于中频率组合（占15-20%），建议结合您的岗位性质与职业目标进行微调。如需更深度解读，可在课后预约1v1咨询。</p>
                     </div>
                 </div>`;
         } else if (priority.level === 'P2' && p2Data) {
-            const fw = p2Data.framework;
+            const fw = p2Data.framework || {};
+            const sg = (b) => (b && typeof b === 'object' ? b : {});
+            const fGoal = sg(fw.goal);
+            const fL2 = sg(fw.layer2);
+            const fL3 = sg(fw.layer3);
+            const fAi = sg(fw.ai);
             comboSection = `
                 <div class="report-section">
                     <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
                     <div class="rare-note">
                         <h4>⚠️ 罕见组合说明</h4>
-                        <p><strong>组合名称：</strong>${p2Data.title} · ${hollandCodes[topCode].name}+${hollandCodes[secondCode].name}</p>
-                        <p><strong>为什么罕见：</strong>${p2Data.rareReason}</p>
-                        <p><strong>如果出现，适合场景：</strong>${p2Data.ifAppears}</p>
+                        <p><strong>组合名称：</strong>${p2Data.title || ''} · ${hTop}+${hSecond}</p>
+                        <p><strong>为什么罕见：</strong>${p2Data.rareReason || ''}</p>
+                        <p><strong>如果出现，适合场景：</strong>${p2Data.ifAppears || ''}</p>
                     </div>
                     <p style="margin-top:15px;color:var(--text-gray);font-size:0.9rem">以下四条建议采用「通用框架+引导自诊」模式，建议您课后与礼徳咨询顾问进行深度解读。</p>
                     <div style="margin-top:20px">
                         <div class="recommendation-card" style="border-left-color:var(--bv-blue)">
-                            <div class="rec-title">🎯 建议1：${fw.goal.title}</div>
-                            <div class="rec-content">${fw.goal.text}</div>
-                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.goal.action30}</div>
+                            <div class="rec-title">🎯 建议1：${fGoal.title || ''}</div>
+                            <div class="rec-content">${fGoal.text || ''}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fGoal.action30 || ''}</div>
                         </div>
                         <div class="recommendation-card" style="border-left-color:#2c5282">
-                            <div class="rec-title">🎯 建议2：${fw.layer2.title}</div>
-                            <div class="rec-content">${fw.layer2.text}</div>
-                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.layer2.action30}</div>
+                            <div class="rec-title">🎯 建议2：${fL2.title || ''}</div>
+                            <div class="rec-content">${fL2.text || ''}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fL2.action30 || ''}</div>
                         </div>
                         <div class="recommendation-card" style="border-left-color:#7c3aed">
-                            <div class="rec-title">🎯 建议3：${fw.layer3.title}</div>
-                            <div class="rec-content">${fw.layer3.text}</div>
-                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.layer3.action30}</div>
+                            <div class="rec-title">🎯 建议3：${fL3.title || ''}</div>
+                            <div class="rec-content">${fL3.text || ''}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fL3.action30 || ''}</div>
                         </div>
                         <div class="recommendation-card" style="border-left-color:var(--ai-purple)">
-                            <div class="rec-title">🤖 建议4：${fw.ai.title}</div>
-                            <div class="rec-content">${fw.ai.text}</div>
-                            <div class="action-30"><strong>📅 30天行动：</strong>${fw.ai.action30}</div>
+                            <div class="rec-title">🤖 建议4：${fAi.title || ''}</div>
+                            <div class="rec-content">${fAi.text || ''}</div>
+                            <div class="action-30"><strong>📅 30天行动：</strong>${fAi.action30 || ''}</div>
                         </div>
                     </div>
                 </div>`;
@@ -1071,7 +1130,7 @@
             comboSection = `
                 <div class="report-section">
                     <h3>🎯 霍兰德前两位组合分析（${topCode}${secondCode}）</h3>
-                    <p>您的前两位组合「${topCode}${secondCode}」属于较为独特的组合。建议您结合前两位「${topCode}${secondCode}」的核心特质，同时关注第三位「${hollandCodes[thirdCode].name}」如何在工作中作为补充优势发挥作用。</p>
+                    <p>您的前两位组合「${topCode}${secondCode}」属于较为独特的组合。建议您结合前两位「${topCode}${secondCode}」的核心特质，同时关注第三位「${hThird}」如何在工作中作为补充优势发挥作用。</p>
                 </div>`;
         }
 
@@ -1081,13 +1140,13 @@
                 <div class="logo">BV</div>
                 <div style="text-align:center">
                     <div style="margin-bottom:15px">
-                        <span class="tag-badge tag-primary">岗位：${userPosition}</span>
-                        <span class="tag-badge tag-accent">性质：${ROLE_TYPES[userRoleType]}</span>
-                        <span class="tag-badge tag-purple">目标：${CAREER_GOALS[userCareerGoal]}</span>
+                        <span class="tag-badge tag-primary">岗位：${posLabel}</span>
+                        <span class="tag-badge tag-accent">性质：${roleLabel}</span>
+                        <span class="tag-badge tag-purple">目标：${goalLabel}</span>
                     </div>
                     <h2 style="color:var(--primary);margin-bottom:10px">您的霍兰德职业兴趣代码是</h2>
                     <div class="result-code">${topCode}${secondCode}${thirdCode}</div>
-                    <p style="color:var(--text-gray);margin-bottom:8px">${hollandCodes[topCode].name} + ${hollandCodes[secondCode].name} + ${hollandCodes[thirdCode].name}</p>
+                    <p style="color:var(--text-gray);margin-bottom:8px">${hTop} + ${hSecond} + ${hThird}</p>
                     ${artisticTopTwo ? `
                     <div class="artistic-note">
                         <strong style="color:var(--ai-purple)">关于艺术型（A）出现在您的主导或次要兴趣：</strong>
@@ -1118,7 +1177,7 @@
                 <div class="report-section">
                     <h3>💡 基于岗位 × 性质 × 目标的定制化建议</h3>
                     <p style="color:var(--text-gray); font-size:0.92rem; line-height:1.7; margin-bottom:22px">
-                        以下四条建议已根据您的<strong>岗位</strong>（${userPosition}）、<strong>岗位性质</strong>（${ROLE_TYPES[userRoleType]}）、<strong>职业目标</strong>（${CAREER_GOALS[userCareerGoal]}）与<strong>霍兰德代码</strong>组合生成。
+                        以下四条建议已根据您的<strong>岗位</strong>（${posLabel}）、<strong>岗位性质</strong>（${roleLabel}）、<strong>职业目标</strong>（${goalLabel}）与<strong>霍兰德代码</strong>组合生成。
                     </p>
                     ${crossAdvice.map((item, i) => `
                         <div class="recommendation-card">
@@ -1135,22 +1194,22 @@
                         <div style="background:linear-gradient(135deg,#e6f0f8,#fff);border-radius:16px;padding:20px;text-align:center">
                             <div style="font-size:2rem;margin-bottom:10px">🚀</div>
                             <h4 style="color:var(--bv-blue);margin-bottom:8px">T - Talent</h4>
-                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${hollandCodes[topCode].name} + ${hollandCodes[secondCode].name}<br>您的天赋在于「${p0Data ? p0Data.title.split('型')[0] : '专业'}」</p>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${hTop} + ${hSecond}<br>您的天赋在于「${talentKw}」</p>
                         </div>
                         <div style="background:linear-gradient(135deg,#fff8e6,#fff);border-radius:16px;padding:20px;text-align:center">
                             <div style="font-size:2rem;margin-bottom:10px">🏢</div>
                             <h4 style="color:var(--accent);margin-bottom:8px">O - Organizational Needs</h4>
-                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${userPosition}<br>组织需要「${isFrontLine(userPosition) ? '交付+客户' : '效率+职能协同'}」人才</p>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${posLabel}<br>组织需要「${isFrontLine(userPosition) ? '交付+客户' : '效率+职能协同'}」人才</p>
                         </div>
                         <div style="background:linear-gradient(135deg,var(--ai-light),#fff);border-radius:16px;padding:20px;text-align:center">
                             <div style="font-size:2rem;margin-bottom:10px">❤️</div>
                             <h4 style="color:var(--ai-purple);margin-bottom:8px">P - Passion</h4>
-                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${CAREER_GOALS[userCareerGoal]}<br>您热爱「${userCareerGoal === 'expert' ? '专业深耕' : '带领团队'}」</p>
+                            <p style="font-size:0.9rem;color:var(--text-gray);margin:0">${goalLabel}<br>您热爱「${userCareerGoal === 'expert' ? '专业深耕' : '带领团队'}」</p>
                         </div>
                     </div>
                     <div style="background:linear-gradient(135deg,var(--bv-light),#fff);border-radius:16px;padding:20px;margin-top:15px;border-left:4px solid var(--bv-blue)">
                         <p style="color:var(--text-gray);margin:0;line-height:1.8">
-                            <strong style="color:var(--primary)">您的TOP交汇点：</strong>成为「${userPosition}领域的${userCareerGoal === 'expert' ? '专家' : '管理者'}」——用${hollandCodes[topCode].name}建立专业壁垒，用${hollandCodes[secondCode].name}创造差异化价值，在组织需求与个人热情之间找到可持续的发展路径。
+                            <strong style="color:var(--primary)">您的TOP交汇点：</strong>成为「${posLabel}领域的${userCareerGoal === 'expert' ? '专家' : '管理者'}」——用${hTop}建立专业壁垒，用${hSecond}创造差异化价值，在组织需求与个人热情之间找到可持续的发展路径。
                         </p>
                     </div>
                 </div>
@@ -1215,6 +1274,7 @@
             data: {
                 labels: ['R实际','I研究','A艺术','S社会','E企业','C常规'],
                 datasets: [{
+                    label: '您的兴趣轮廓',
                     data: radarVals,
                     backgroundColor: 'rgba(0,85,164,0.2)',
                     borderColor: '#0055a4',
@@ -1227,6 +1287,11 @@
                 maintainAspectRatio: true,
                 animation: false,
                 events: [],
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: { r: { beginAtZero: true, max: 100 } }
             }
         });
